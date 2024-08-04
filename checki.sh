@@ -2,10 +2,10 @@
 
 # Directories
 DIR1="."
-DIR2="test"
+DIR2="tests/valid_tests"
 
 # Files to check
-FILES=("invalid_01.am" "invalid_02.am")
+FILES=("double_macro.ob" "double_macro.am" "valid_01.am" "valid_01.as" "valid_01.ob" "valid_02.as" "valid_02.am" "valid_02.ob" "valid_02.ent" "valid_02.ext")
 
 # Flag to track if all files are identical
 all_identical=true

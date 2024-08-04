@@ -30,8 +30,12 @@
 #define TRUE 1
 #define INFINITE_LOOP for(;;)
 
-/*--The numbers are assigned as the bits which will be turned on regarding the matching opType.
-typedef enum { NUMBER = 1, LABEL = 2, INDREGISTER = 4, REGISTER = 8, INVALID = -1 } opType;  Operands */
+/* A R E type as bits*/
+typedef enum { 
+    ARE_EXT = 1,          /* External */
+    ARE_RELOC = 2,        /* Relocatable */
+    ARE_ABS = 4           /* Absolute */
+} AREKind;
 
 /* Numbers as bit flags corresponding to each operand type. */
 typedef enum { 
@@ -42,27 +46,21 @@ typedef enum {
     OP_INVALID = -1       /* Invalid operand */
 } OperandType; 
 
-/*--The numbers are assigned as the bits which will be turned on regarding the matching ARE type. 
-typedef enum { EXTERNAL = 1, RELOCATABLE = 2, ABSOLUTE = 4 } areType;*/
-
-/* A R E type as bits*/
-typedef enum { 
-    ARE_EXT = 1,          /* External */
-    ARE_RELOC = 2,        /* Relocatable */
-    ARE_ABS = 4           /* Absolute */
-} AREKind;
-
-/*-- typedef unsigned int bool;  Only get TRUE or FALSE values */
 typedef unsigned int boolean; /* TRUE or FALSE values */
 
+/* Directive Structure */
+typedef struct {
+    char *name;          /* Directive name. */
+    void (*parseFunc)(); /* Function pointer to the function that parses this directive. */
+} directive;
 
-/*--typedef struct node  Node Structure
+/* Command Structure */
+typedef struct 
 {
-    char *name;
-    char *content;
-    int line;
-    struct node *next;
-} node; */
+    char *name;              /* Command name. */
+    unsigned int opcode : 4; /* opcode uses 4 bits. */
+    int numOfParams;         /* Number of parameters  */
+} command;
 
 /* Macro Node Structure */
 typedef struct macroNode{
@@ -71,19 +69,6 @@ typedef struct macroNode{
     char *content;              /* Macro definition. */
     struct macroNode *next;     /* Link to the next macro node. */
 } MacroNode;
-
-typedef struct /* Command Structure */
-{
-    char *name; /* The name of the command. */
-    unsigned int opcode : 4; /* The opcode of the command, using 4 bits. */
-    int numOfParams; /* The number of parameters the command takes. */
-} command;
-
-typedef struct /* Directive Structure */
-{
-    char *name; /* The name of the directive. */
-    void (*parseFunc)(); /* Function pointer to the function that parses this directive. */
-} directive;
 
 typedef struct /* Labels Structure */
 {

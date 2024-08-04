@@ -5,7 +5,7 @@ DIR1="."
 DIR2="test"
 
 # Files to check
-FILES=("course_example.am" "course_example.ob" "course_example.ent" "course_example.ext")
+FILES=("course_example.am" "course_example.ob" "course_example.ent" "course_example.ext" "invalid_01.am" "invalid_02.am")
 
 # Flag to track if all files are identical
 all_identical=true
