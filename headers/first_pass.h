@@ -25,7 +25,7 @@ labelInfo *addLabelToArr(labelInfo label, lineInfo *line);
  * @param lineNum The line number (used for error reporting).
  * @return TRUE if the number was added successfully, FALSE if there is not enough space.
  */
-bool addNumberToData(int num, int *IC, int *DC, int lineNum);
+boolean addNumberToData(int num, int *IC, int *DC, int lineNum);
 
 /**
  * @brief Adds a string to the data array by converting each character to its ASCII value.
@@ -36,7 +36,7 @@ bool addNumberToData(int num, int *IC, int *DC, int lineNum);
  * @param lineNum The line number (used for error reporting).
  * @return TRUE if the string was added successfully, FALSE if there is not enough space.
  */
-bool addStringToData(char *str, int *IC, int *DC, int lineNum);
+boolean addStringToData(char *str, int *IC, int *DC, int lineNum);
 
 /**
  * @brief Finds and processes a label in a line of assembly code.
@@ -156,7 +156,7 @@ void parseLine(lineInfo *line, char *lineStr, int lineNum, int *IC, int *DC);
  * @param maxLength The maximum length of the line to read.
  * @return Returns TRUE if a line is successfully read, otherwise FALSE.
  */
-bool readLine(FILE *file, char *line_data, size_t maxLength);
+boolean readLine(FILE *file, char *line_data, size_t maxLength);
 
 /**
  * @brief Performs the first pass of the assembler.

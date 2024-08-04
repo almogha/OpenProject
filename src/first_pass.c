@@ -66,7 +66,7 @@ labelInfo *addLabelToArr(labelInfo label, lineInfo *line) /* Documentation in "a
 	return NULL;
 }
 
-bool addNumberToData(int num, int *IC, int *DC, int lineNum) /* Documentation in "assembler.h". */
+boolean addNumberToData(int num, int *IC, int *DC, int lineNum) /* Documentation in "assembler.h". */
 {
 	if (*DC + *IC < RAM_LIMIT) /* Checks if there is enough space in g_dataArr for the data. */
 	{
@@ -79,7 +79,7 @@ bool addNumberToData(int num, int *IC, int *DC, int lineNum) /* Documentation in
 	return TRUE;
 }
 
-bool addStringToData(char *str, int *IC, int *DC, int lineNum) /* Documentation in "assembler.h". */
+boolean addStringToData(char *str, int *IC, int *DC, int lineNum) /* Documentation in "assembler.h". */
 {
 	do
 	{
@@ -124,7 +124,7 @@ void parseDataDirc(lineInfo *line, int *IC, int *DC) /* Documentation in "assemb
 {
 	char *operandTok = line->lineStr, *endOfOp = line->lineStr;
 	int operandValue;
-	bool foundComma;
+	boolean foundComma;
 
 	if (line->label) /* Make the label a data label (if there is one). */
 	{
@@ -254,7 +254,7 @@ void parseDirective(lineInfo *line, int *IC, int *DC) /* Documentation in "assem
 	line->isError = TRUE;
 }
 
-bool areLegalOpTypes(const command *cmd, operandInfo op1, operandInfo op2, int lineNum) /* Documentation in "assembler.h". */
+boolean areLegalOpTypes(const command *cmd, operandInfo op1, operandInfo op2, int lineNum) /* Documentation in "assembler.h". */
 {
 	/* Checks First Operand. */
 	if (cmd->opcode == 4 && op1.type != LABEL) /* "lea" command (opcode is 4) can only get a label as the 1st op. */
@@ -322,7 +322,7 @@ void parseOpInfo(operandInfo *operand, int lineNum) /* Documentation in "assembl
 void parseCmdOperands(lineInfo *line, int *IC, int *DC) /* Documentation in "assembler.h". */
 {
 	char *startOfNextPart = line->lineStr;
-	bool foundComma = FALSE;
+	boolean foundComma = FALSE;
 	int numOfOpsFound = 0;
 
 	/* Reset the op types. */
@@ -482,7 +482,7 @@ void parseLine(lineInfo *line, char *lineStr, int lineNum, int *IC, int *DC) /* 
 	}
 }
 
-bool readLine(FILE *file, char *line_data, size_t maxLength) /* Documentation in "assembler.h". */
+boolean readLine(FILE *file, char *line_data, size_t maxLength) /* Documentation in "assembler.h". */
 {
 	char *endOfLine;
 
@@ -499,7 +499,7 @@ bool readLine(FILE *file, char *line_data, size_t maxLength) /* Documentation in
 	else
 	{
 		char c;
-		bool ret = (feof(file)) ? TRUE : FALSE; /* Return FALSE, unless it's the end of the file. */
+		boolean ret = (feof(file)) ? TRUE : FALSE; /* Return FALSE, unless it's the end of the file. */
 
 		do /* Keep reading chars until you reach the end of the line ('\n') or EOF. */
 		{

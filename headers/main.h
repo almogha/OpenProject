@@ -36,7 +36,9 @@ typedef enum { NUMBER = 1, LABEL = 2, INDREGISTER = 4, REGISTER = 8, INVALID = -
 /*The numbers are assigned as the bits which will be turned on regarding the matching ARE type. */
 typedef enum { EXTERNAL = 1, RELOCATABLE = 2, ABSOLUTE = 4 } areType;
 
-typedef unsigned int bool; /* Only get TRUE or FALSE values */
+/*-- typedef unsigned int bool;  Only get TRUE or FALSE values */
+typedef unsigned int boolean; /* TRUE or FALSE values */
+
 
 typedef struct node /* Node Structure */
 {
@@ -63,8 +65,8 @@ typedef struct /* Labels Structure */
 {
 	int address; /* The address it contains. */
 	char name[LABEL_MAX_LENGTH]; /* The name of the label. */					
-	bool isExtern; /* Extern flag. */
-	bool isData; /* Data flag (.data or .string). */
+	boolean isExtern; /* Extern flag. */
+	boolean isData; /* Data flag (.data or .string). */
 } labelInfo;
 
 typedef struct /* Operand Structure */
@@ -81,7 +83,7 @@ typedef struct /* Line Structure */
 	int address; /* The address of the first word in the line. */
 	char *originalString; /* The original pointer, allocated by malloc. */
 	char *lineStr; /* The text it contains (changed while using parseLine). */
-	bool isError; /* Represent whether there is an error or not. */
+	boolean isError; /* Represent whether there is an error or not. */
 	labelInfo *label; /* A poniter to the lines label in labelArr. */
 	char *commandStr; /* The string of the command or directive. */
 	const command *cmd;	/* A pointer to the command in g_cmdArr. */

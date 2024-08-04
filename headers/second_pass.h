@@ -36,7 +36,7 @@ int countIllegalEntries();
  * @param lineNum The line number where the operand is located (used for error reporting).
  * @return Returns TRUE if the label exists and the address was updated, otherwise FALSE.
  */
-bool updateLabelOpAddress(operandInfo *op, int lineNum);
+boolean updateLabelOpAddress(operandInfo *op, int lineNum);
 
 /**
  * @brief Extracts the numerical value from a memory word.
@@ -79,7 +79,7 @@ memoryWord getCmdMemoryWord(lineInfo line);
  * @param isDest A flag indicating if the operand is a destination operand.
  * @return The created memory word for the operand.
  */
-memoryWord getOpMemoryWord(operandInfo op, bool isDest);
+memoryWord getOpMemoryWord(operandInfo op, boolean isDest);
 
 /**
  * @brief Adds a memory word to the memory array.
@@ -103,7 +103,7 @@ void addWordToMemory(int *memoryArr, int *memoryCounter, memoryWord memory);
  * @param line A pointer to the line information.
  * @return Returns TRUE if no error was found, otherwise FALSE.
  */
-bool addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line);
+boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line);
 
 /**
  * @brief Adds data to the memory array.

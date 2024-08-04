@@ -42,7 +42,7 @@ int countIllegalEntries()
 	return ret;
 }
 
-bool updateLabelOpAddress(operandInfo *op, int lineNum)
+boolean updateLabelOpAddress(operandInfo *op, int lineNum)
 {
 	if (op->type == LABEL)
 	{
@@ -91,7 +91,7 @@ memoryWord getCmdMemoryWord(lineInfo line)
 	return memory;
 }
 
-memoryWord getOpMemoryWord(operandInfo op, bool isDest)
+memoryWord getOpMemoryWord(operandInfo op, boolean isDest)
 {
 	memoryWord memory = { 0 };
 
@@ -148,9 +148,9 @@ void addWordToMemory(int *memoryArr, int *memoryCounter, memoryWord memory)
 	}
 }
 
-bool addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
+boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 {
-	bool foundError = FALSE;
+	boolean foundError = FALSE;
 
 	if (!line->isError && line->cmd != NULL)
 	{

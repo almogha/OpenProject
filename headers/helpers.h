@@ -83,14 +83,14 @@ char *getFirstTok(char *str, char **endOfTok);
  * @param str The input string.
  * @return TRUE if the string contains only one word, FALSE otherwise.
  */
-bool isOneWord(char *str);
+boolean isOneWord(char *str);
 
 /**
  * Checks if a string contains only whitespace characters.
  * @param str The input string.
  * @return TRUE if the string contains only whitespace characters, FALSE otherwise.
  */
-bool isWhiteSpaces(char *str);
+boolean isWhiteSpaces(char *str);
 
 /**
  * Checks if a label name is legal.
@@ -99,21 +99,21 @@ bool isWhiteSpaces(char *str);
  * @param printErrors Whether to print errors if the label is illegal.
  * @return TRUE if the label name is legal, FALSE otherwise.
  */
-bool isLegalLabel(char *labelStr, int lineNum, bool printErrors);
+boolean isLegalLabel(char *labelStr, int lineNum, boolean printErrors);
 
 /**
  * Checks if a label exists in the global label array.
  * @param label The label name to check.
  * @return TRUE if the label exists, FALSE otherwise.
  */
-bool isExistingLabel(char *label);
+boolean isExistingLabel(char *label);
 
 /**
  * Checks if a label is already defined as an entry label.
  * @param labelName The label name to check.
  * @return TRUE if the label is already defined as an entry label, FALSE otherwise.
  */
-bool isExistingEntryLabel(char *labelName);
+boolean isExistingEntryLabel(char *labelName);
 
 /**
  * Checks if a string is a register name and updates the value if it is.
@@ -121,7 +121,7 @@ bool isExistingEntryLabel(char *labelName);
  * @param value A pointer to update with the register value.
  * @return TRUE if the string is a register name, FALSE otherwise.
  */
-bool isRegister(char *str, int *value);
+boolean isRegister(char *str, int *value);
 
 /**
  * Checks if a string is an indirect register and updates the value if it is.
@@ -129,14 +129,14 @@ bool isRegister(char *str, int *value);
  * @param value A pointer to update with the register value.
  * @return TRUE if the string is an indirect register, FALSE otherwise.
  */
-bool isIndirectRegister(char *str, int *value);
+boolean isIndirectRegister(char *str, int *value);
 
 /**
  * Checks if a line is a comment or empty.
  * @param line A pointer to the line information structure.
  * @return TRUE if the line is a comment or empty, FALSE otherwise.
  */
-bool isCommentOrEmpty(lineInfo *line);
+boolean isCommentOrEmpty(lineInfo *line);
 
 /**
  * Returns the first operand in a line and updates the end of the operand.
@@ -145,14 +145,14 @@ bool isCommentOrEmpty(lineInfo *line);
  * @param foundComma A pointer to update if a comma is found.
  * @return A pointer to the start of the first operand.
  */
-char *getFirstOperand(char *line, char **endOfOp, bool *foundComma);
+char *getFirstOperand(char *line, char **endOfOp, boolean *foundComma);
 
 /**
  * Checks if a command is a directive.
  * @param cmd The command string to check.
  * @return TRUE if the command is a directive, FALSE otherwise.
  */
-bool isDirective(char *cmd);
+boolean isDirective(char *cmd);
 
 /**
  * Checks if a string parameter is a legal string and removes the quotes.
@@ -160,7 +160,7 @@ bool isDirective(char *cmd);
  * @param lineNum The line number for error reporting.
  * @return TRUE if the string parameter is legal, FALSE otherwise.
  */
-bool isLegalStringParam(char **strParam, int lineNum);
+boolean isLegalStringParam(char **strParam, int lineNum);
 
 /**
  * Checks if a number string is a legal number and updates its value.
@@ -170,7 +170,7 @@ bool isLegalStringParam(char **strParam, int lineNum);
  * @param value A pointer to update with the number value.
  * @return TRUE if the number string is legal, FALSE otherwise.
  */
-bool isLegalNum(char *numStr, int numOfBits, int lineNum, int *value);
+boolean isLegalNum(char *numStr, int numOfBits, int lineNum, int *value);
 
 /**
  * Returns the length of a number in octal representation.

@@ -170,7 +170,7 @@ char *getFirstTok(char *str, char **endOfTok)
     return tokStart; /* Return the start of the first token. */
 }
 
-bool isOneWord(char *str)
+boolean isOneWord(char *str)
 {
     trimLeftStr(&str); /* Remove leading whitespace. */
     while (!isspace(*str) && *str)
@@ -180,7 +180,7 @@ bool isOneWord(char *str)
     return isWhiteSpaces(str); /* Check if the remaining text is all whitespace. */
 }
 
-bool isWhiteSpaces(char *str)
+boolean isWhiteSpaces(char *str)
 {
     while (*str)
     {
@@ -192,7 +192,7 @@ bool isWhiteSpaces(char *str)
     return TRUE; /* Return true if only whitespace characters are found. */
 }
 
-bool isLegalLabel(char *labelStr, int lineNum, bool printErrors)
+boolean isLegalLabel(char *labelStr, int lineNum, boolean printErrors)
 {
     int labelLength = strlen(labelStr), i;
 
@@ -274,7 +274,7 @@ bool isLegalLabel(char *labelStr, int lineNum, bool printErrors)
     return TRUE;
 }
 
-bool isExistingLabel(char *label)
+boolean isExistingLabel(char *label)
 {
     if (getLabel(label))
     {
@@ -285,7 +285,7 @@ bool isExistingLabel(char *label)
     return FALSE;
 }
 
-bool isExistingEntryLabel(char *labelName)
+boolean isExistingEntryLabel(char *labelName)
 {
     int i = 0;
 
@@ -302,7 +302,7 @@ bool isExistingEntryLabel(char *labelName)
     return FALSE;
 }
 
-bool isRegister(char *str, int *value)
+boolean isRegister(char *str, int *value)
 {
     if (str[0] == 'r' && str[1] >= '0' && str[1] - '0' <= NUM_OF_REG && str[2] == '\0')
     {
@@ -316,7 +316,7 @@ bool isRegister(char *str, int *value)
     return FALSE;
 }
 
-bool isIndirectRegister(char *str, int *value)
+boolean isIndirectRegister(char *str, int *value)
 {
     if (str[0] == '*' && str[1] == 'r' && str[2] >= '0' && str[2] - '0' <= NUM_OF_REG && str[3] == '\0')
     {
@@ -330,7 +330,7 @@ bool isIndirectRegister(char *str, int *value)
     return FALSE;
 }
 
-bool isCommentOrEmpty(lineInfo *line)
+boolean isCommentOrEmpty(lineInfo *line)
 {
     char *startOfText = line->lineStr;
 
@@ -354,7 +354,7 @@ bool isCommentOrEmpty(lineInfo *line)
     return FALSE;
 }
 
-char *getFirstOperand(char *line, char **endOfOp, bool *foundComma)
+char *getFirstOperand(char *line, char **endOfOp, boolean *foundComma)
 {
     if (!isWhiteSpaces(line))
     {
@@ -387,12 +387,12 @@ char *getFirstOperand(char *line, char **endOfOp, bool *foundComma)
     return line;
 }
 
-bool isDirective(char *cmd)
+boolean isDirective(char *cmd)
 {
     return (*cmd == '.') ? TRUE : FALSE;
 }
 
-bool isLegalStringParam(char **strParam, int lineNum)
+boolean isLegalStringParam(char **strParam, int lineNum)
 {
     if ((*strParam)[0] == '"' && (*strParam)[strlen(*strParam) - 1] == '"')
     {
@@ -412,7 +412,7 @@ bool isLegalStringParam(char **strParam, int lineNum)
     return FALSE;
 }
 
-bool isLegalNum(char *numStr, int numOfBits, int lineNum, int *value)
+boolean isLegalNum(char *numStr, int numOfBits, int lineNum, int *value)
 {
     char *endOfNum;
     int maxNum = (1 << numOfBits) - 1; /* Calculate the maximum number that can be represented. */
@@ -616,7 +616,7 @@ void createExternFile(char *name, lineInfo *linesArr, int linesFound)
 {
     int i;
     labelInfo *label;
-    bool firstPrint = TRUE; /* Flag to indicate if this is the first extern label. */
+    boolean firstPrint = TRUE; /* Flag to indicate if this is the first extern label. */
     FILE *file = NULL;
     char *base_name;
 
