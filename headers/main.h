@@ -1,5 +1,5 @@
-/* The C Programming Language Course Final Project, Semester 2024B, Open University Israel */
-/* Name: Menahem Hen Perets, ID: 318246014 */
+/* Name: Almog Hakak, ID: 211825229 */
+
 #ifndef ASSEMBLER_H
 #define ASSEMBLER_H
 
