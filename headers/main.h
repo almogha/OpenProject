@@ -30,8 +30,17 @@
 #define TRUE 1
 #define INFINITE_LOOP for(;;)
 
-/*The numbers are assigned as the bits which will be turned on regarding the matching opType. */
-typedef enum { NUMBER = 1, LABEL = 2, INDREGISTER = 4, REGISTER = 8, INVALID = -1 } opType; /* Operands */
+/*--The numbers are assigned as the bits which will be turned on regarding the matching opType.
+typedef enum { NUMBER = 1, LABEL = 2, INDREGISTER = 4, REGISTER = 8, INVALID = -1 } opType;  Operands */
+
+/* The numbers are assigned as bit flags corresponding to each operand type. */
+typedef enum { 
+    OP_NUMERIC = 1,       /* Numeric operand */
+    OP_LABEL = 2,         /* Label operand */
+    OP_INDIRECT_REG = 4,  /* Indirect register operand */
+    OP_REGULAR_REG = 8,   /* Register operand */
+    OP_INVALID = -1       /* Invalid operand */
+} OperandType; 
 
 /*The numbers are assigned as the bits which will be turned on regarding the matching ARE type. */
 typedef enum { EXTERNAL = 1, RELOCATABLE = 2, ABSOLUTE = 4 } areType;
@@ -73,7 +82,7 @@ typedef struct /* Operand Structure */
 {
 	int value; /* Value. */
 	char *str; /* String. */
-	opType type; /* Type. */
+	OperandType type; /* Type. */
 	int address; /* The address of the operand in the memory. */
 } operandInfo;
 

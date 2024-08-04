@@ -622,7 +622,7 @@ void createExternFile(char *name, lineInfo *linesArr, int linesFound)
 
     for (i = 0; i < linesFound; i++)
     {
-        if (linesArr[i].cmd && linesArr[i].cmd->numOfParams >= 2 && linesArr[i].op1.type == LABEL)
+        if (linesArr[i].cmd && linesArr[i].cmd->numOfParams >= 2 && linesArr[i].op1.type == OP_LABEL)
         {
             label = getLabel(linesArr[i].op1.str);
             if (label && label->isExtern)
@@ -643,7 +643,7 @@ void createExternFile(char *name, lineInfo *linesArr, int linesFound)
             }
         }
 
-        if (linesArr[i].cmd && linesArr[i].cmd->numOfParams >= 1 && linesArr[i].op2.type == LABEL)
+        if (linesArr[i].cmd && linesArr[i].cmd->numOfParams >= 1 && linesArr[i].op2.type == OP_LABEL)
         {
             label = getLabel(linesArr[i].op2.str);
             if (label && label->isExtern)

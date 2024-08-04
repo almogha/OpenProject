@@ -30,7 +30,7 @@ int countIllegalEntries();
 /**
  * @brief Updates the address of a label operand.
  *
- * This function checks if the operand is of type LABEL. If so, it retrieves the label information
+ * This function checks if the operand is of type OP_LABEL. If so, it retrieves the label information
  * and updates the operand's value with the label's address. If the label does not exist, an error is reported.
  * @param op A pointer to the operand information to be updated.
  * @param lineNum The line number where the operand is located (used for error reporting).

@@ -44,7 +44,7 @@ int countIllegalEntries()
 
 boolean updateLabelOpAddress(operandInfo *op, int lineNum)
 {
-	if (op->type == LABEL)
+	if (op->type == OP_LABEL)
 	{
 		labelInfo *label = getLabel(op->str);
 		if (label == NULL)
@@ -71,7 +71,7 @@ int getNumFromMemoryWord(memoryWord memory)
 
 int getOpTypeId(operandInfo op)
 {
-	if (op.type != INVALID)
+	if (op.type != OP_INVALID)
 	{
 		return (int)op.type; /* Return the operand type ID if it's valid. */
 	}
@@ -95,7 +95,7 @@ memoryWord getOpMemoryWord(operandInfo op, boolean isDest)
 {
 	memoryWord memory = { 0 };
 
-	if (op.type == REGISTER)
+	if (op.type == OP_REGULAR_REG)
 	{
 		memory.are = (areType)ABSOLUTE;
 
@@ -108,7 +108,7 @@ memoryWord getOpMemoryWord(operandInfo op, boolean isDest)
 			memory.valueBits.regBits.srcBits = op.value; /* Set the source register value. */
 		}
 	}
-	else if (op.type == INDREGISTER)
+	else if (op.type == OP_INDIRECT_REG)
 	{
 		memory.are = (areType)ABSOLUTE;
 
@@ -125,13 +125,13 @@ memoryWord getOpMemoryWord(operandInfo op, boolean isDest)
 	{
 		labelInfo *label = getLabel(op.str);
 
-		if (op.type == LABEL && label && label->isExtern)
+		if (op.type == OP_LABEL && label && label->isExtern)
 		{
 			memory.are = EXTERNAL; /* Set the ARE type to external if the label is external. */
 		}
 		else
 		{
-			memory.are = (op.type == NUMBER) ? (areType)ABSOLUTE : (areType)RELOCATABLE; /* Set ARE type based on operand type. */
+			memory.are = (op.type == OP_NUMERIC) ? (areType)ABSOLUTE : (areType)RELOCATABLE; /* Set ARE type based on operand type. */
 		}
 
 		memory.valueBits.value = op.value; /* Set the operand value. */
@@ -162,7 +162,7 @@ boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 
 		addWordToMemory(memoryArr, memoryCounter, getCmdMemoryWord(*line)); /* Add the command memory word to memory. */
 
-		if (line->op1.type == REGISTER && line->op2.type == REGISTER)
+		if (line->op1.type == OP_REGULAR_REG && line->op2.type == OP_REGULAR_REG)
 		{
 			memoryWord memory = { 0 };
 			memory.are = (areType)ABSOLUTE;
@@ -171,7 +171,7 @@ boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 
 			addWordToMemory(memoryArr, memoryCounter, memory); /* Add register operand memory word. */
 		}
-		else if (line->op1.type == REGISTER && line->op2.type == INDREGISTER)
+		else if (line->op1.type == OP_REGULAR_REG && line->op2.type == OP_INDIRECT_REG)
 		{
 			memoryWord memory = { 0 };
 			memory.are = (areType)ABSOLUTE;
@@ -180,7 +180,7 @@ boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 
 			addWordToMemory(memoryArr, memoryCounter, memory); /* Add indirect register operand memory word. */
 		}
-		else if (line->op1.type == INDREGISTER && line->op2.type == REGISTER)
+		else if (line->op1.type == OP_INDIRECT_REG && line->op2.type == OP_REGULAR_REG)
 		{
 			memoryWord memory = { 0 };
 			memory.are = (areType)ABSOLUTE;
@@ -189,7 +189,7 @@ boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 
 			addWordToMemory(memoryArr, memoryCounter, memory); /* Add indirect register operand memory word. */
 		}
-		else if (line->op1.type == INDREGISTER && line->op2.type == INDREGISTER)
+		else if (line->op1.type == OP_INDIRECT_REG && line->op2.type == OP_INDIRECT_REG)
 		{
 			memoryWord memory = { 0 };
 			memory.are = (areType)ABSOLUTE;
@@ -200,13 +200,13 @@ boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 		}
 		else
 		{
-			if (line->op1.type != INVALID)
+			if (line->op1.type != OP_INVALID)
 			{
 				line->op1.address = INITIAL_ADDRESS + *memoryCounter;
 				addWordToMemory(memoryArr, memoryCounter, getOpMemoryWord(line->op1, FALSE)); /* Add operand 1 memory word to memory. */
 			}
 
-			if (line->op2.type != INVALID)
+			if (line->op2.type != OP_INVALID)
 			{
 				line->op2.address = INITIAL_ADDRESS + *memoryCounter;
 				addWordToMemory(memoryArr, memoryCounter, getOpMemoryWord(line->op2, TRUE)); /* Add operand 2 memory word to memory. */

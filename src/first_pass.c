@@ -257,14 +257,14 @@ void parseDirective(lineInfo *line, int *IC, int *DC) /* Documentation in "assem
 boolean areLegalOpTypes(const command *cmd, operandInfo op1, operandInfo op2, int lineNum) /* Documentation in "assembler.h". */
 {
 	/* Checks First Operand. */
-	if (cmd->opcode == 4 && op1.type != LABEL) /* "lea" command (opcode is 4) can only get a label as the 1st op. */
+	if (cmd->opcode == 4 && op1.type != OP_LABEL) /* "lea" command (opcode is 4) can only get a label as the 1st op. */
 	{
 		printError(lineNum, "ERROR: Source operand for \"%s\" command must be a label.", cmd->name);
 		return FALSE;
 	}
 
 	/* Checks Second Operand.*/
-	if (op2.type == NUMBER && cmd->opcode != 1 && cmd->opcode != 12) /* 2nd operand can be a number only if the command is "cmp" (opcode is 1) or "prn" (opcode is 12). */
+	if (op2.type == OP_NUMERIC && cmd->opcode != 1 && cmd->opcode != 12) /* 2nd operand can be a number only if the command is "cmp" (opcode is 1) or "prn" (opcode is 12). */
 	{
 		printError(lineNum, "ERROR: Destination operand for \"%s\" command can't be a number.", cmd->name);
 		return FALSE;
@@ -279,40 +279,40 @@ void parseOpInfo(operandInfo *operand, int lineNum) /* Documentation in "assembl
 	if (isWhiteSpaces(operand->str))
 	{
 		printError(lineNum, "ERROR: Empty parameter.");
-		operand->type = INVALID;
+		operand->type = OP_INVALID;
 		return;
 	}
 
-	if (*operand->str == '#') /* Checks if the type is a NUMBER. */
+	if (*operand->str == '#') /* Checks if the type is a OP_NUMERIC. */
 	{
 		operand->str++; /* Remove the '#'. */
 		if (isspace(*operand->str)) /* Checks if the number is legal. */
 		{
 			printError(lineNum, "ERROR: There is a white space after the '#'.");
-			operand->type = INVALID;
+			operand->type = OP_INVALID;
 		}
 		else
 		{
-			operand->type = isLegalNum(operand->str, WORD_LENGTH - 3, lineNum, &value) ? NUMBER : INVALID;
+			operand->type = isLegalNum(operand->str, WORD_LENGTH - 3, lineNum, &value) ? OP_NUMERIC : OP_INVALID;
 		}
 	 }
 	
-	else if (isIndirectRegister(operand->str, &value)) /* Checks if the type is INDREGISTER. */
+	else if (isIndirectRegister(operand->str, &value)) /* Checks if the type is OP_INDIRECT_REG. */
 	{
-		operand->type = INDREGISTER;
+		operand->type = OP_INDIRECT_REG;
 	}
-	else if (isRegister(operand->str, &value)) /* Checks if the type is REGISTER. */
+	else if (isRegister(operand->str, &value)) /* Checks if the type is OP_REGULAR_REG. */
 	{
-		operand->type = REGISTER;
+		operand->type = OP_REGULAR_REG;
 	}
-	else if (isLegalLabel(operand->str, lineNum, FALSE)) /* Checks if the type is LABEL. */
+	else if (isLegalLabel(operand->str, lineNum, FALSE)) /* Checks if the type is OP_LABEL. */
 	{
-		operand->type = LABEL;
+		operand->type = OP_LABEL;
 	}
-	else /* The type is INVALID. */
+	else /* The type is OP_INVALID. */
 	{
 		printError(lineNum, "ERROR: \"%s\" is an invalid parameter.", operand->str);
-		operand->type = INVALID;
+		operand->type = OP_INVALID;
 		value = -1;
 	}
 
@@ -326,13 +326,13 @@ void parseCmdOperands(lineInfo *line, int *IC, int *DC) /* Documentation in "ass
 	int numOfOpsFound = 0;
 
 	/* Reset the op types. */
-	line->op1.type = INVALID;
-	line->op2.type = INVALID;
+	line->op1.type = OP_INVALID;
+	line->op2.type = OP_INVALID;
 	
 	INFINITE_LOOP /* Get the parameters. */
 	{
 		/* If both of the operands are registers, or indirect registers they will only take 1 memory word (instead of 2). */
-		if (!(line->op1.type == REGISTER && line->op2.type == REGISTER) && !(line->op1.type == REGISTER && line->op2.type == INDREGISTER) && !(line->op1.type == INDREGISTER && line->op2.type == REGISTER) && !(line->op1.type == INDREGISTER && line->op2.type == INDREGISTER))
+		if (!(line->op1.type == OP_REGULAR_REG && line->op2.type == OP_REGULAR_REG) && !(line->op1.type == OP_REGULAR_REG && line->op2.type == OP_INDIRECT_REG) && !(line->op1.type == OP_INDIRECT_REG && line->op2.type == OP_REGULAR_REG) && !(line->op1.type == OP_INDIRECT_REG && line->op2.type == OP_INDIRECT_REG))
 		{	
 			if (*IC + *DC < RAM_LIMIT) /* Checks if there is enough memory. */
 			{
@@ -353,13 +353,13 @@ void parseCmdOperands(lineInfo *line, int *IC, int *DC) /* Documentation in "ass
 		if (numOfOpsFound == 1) /* If there are 2 ops, make the destination become the source op. */
 		{
 			line->op1 = line->op2;
-			line->op2.type = INVALID; /* Reset op2. */
+			line->op2.type = OP_INVALID; /* Reset op2. */
 		}
 		
 		line->op2.str = getFirstOperand(line->lineStr, &startOfNextPart, &foundComma); /* Parse the opernad. */
 		parseOpInfo(&line->op2, line->lineNum);
 
-		if (line->op2.type == INVALID)
+		if (line->op2.type == OP_INVALID)
 		{
 			line->isError = TRUE;
 			return;
