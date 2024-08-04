@@ -83,7 +83,7 @@ memoryWord getCmdMemoryWord(lineInfo line)
 {
 	memoryWord memory = { 0 };
 
-	memory.are = (areType)ABSOLUTE;
+	memory.are = (AREKind)ARE_ABS;
 	memory.valueBits.cmdBits.dest = getOpTypeId(line.op2); /* Set the destination operand type. */
 	memory.valueBits.cmdBits.src = getOpTypeId(line.op1); /* Set the source operand type. */
 	memory.valueBits.cmdBits.opcode = line.cmd->opcode; /* Set the opcode. */
@@ -97,7 +97,7 @@ memoryWord getOpMemoryWord(operandInfo op, boolean isDest)
 
 	if (op.type == OP_REGULAR_REG)
 	{
-		memory.are = (areType)ABSOLUTE;
+		memory.are = (AREKind)ARE_ABS;
 
 		if (isDest)
 		{
@@ -110,7 +110,7 @@ memoryWord getOpMemoryWord(operandInfo op, boolean isDest)
 	}
 	else if (op.type == OP_INDIRECT_REG)
 	{
-		memory.are = (areType)ABSOLUTE;
+		memory.are = (AREKind)ARE_ABS;
 
 		if (isDest)
 		{
@@ -127,11 +127,11 @@ memoryWord getOpMemoryWord(operandInfo op, boolean isDest)
 
 		if (op.type == OP_LABEL && label && label->isExtern)
 		{
-			memory.are = EXTERNAL; /* Set the ARE type to external if the label is external. */
+			memory.are = ARE_EXT; /* Set the ARE type to external if the label is external. */
 		}
 		else
 		{
-			memory.are = (op.type == OP_NUMERIC) ? (areType)ABSOLUTE : (areType)RELOCATABLE; /* Set ARE type based on operand type. */
+			memory.are = (op.type == OP_NUMERIC) ? (AREKind)ARE_ABS : (AREKind)ARE_RELOC; /* Set ARE type based on operand type. */
 		}
 
 		memory.valueBits.value = op.value; /* Set the operand value. */
@@ -165,7 +165,7 @@ boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 		if (line->op1.type == OP_REGULAR_REG && line->op2.type == OP_REGULAR_REG)
 		{
 			memoryWord memory = { 0 };
-			memory.are = (areType)ABSOLUTE;
+			memory.are = (AREKind)ARE_ABS;
 			memory.valueBits.regBits.destBits = line->op2.value;
 			memory.valueBits.regBits.srcBits = line->op1.value;
 
@@ -174,7 +174,7 @@ boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 		else if (line->op1.type == OP_REGULAR_REG && line->op2.type == OP_INDIRECT_REG)
 		{
 			memoryWord memory = { 0 };
-			memory.are = (areType)ABSOLUTE;
+			memory.are = (AREKind)ARE_ABS;
 			memory.valueBits.regBits.destBits = line->op2.value;
 			memory.valueBits.regBits.srcBits = line->op1.value;
 
@@ -183,7 +183,7 @@ boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 		else if (line->op1.type == OP_INDIRECT_REG && line->op2.type == OP_REGULAR_REG)
 		{
 			memoryWord memory = { 0 };
-			memory.are = (areType)ABSOLUTE;
+			memory.are = (AREKind)ARE_ABS;
 			memory.valueBits.regBits.destBits = line->op2.value;
 			memory.valueBits.regBits.srcBits = line->op1.value;
 
@@ -192,7 +192,7 @@ boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 		else if (line->op1.type == OP_INDIRECT_REG && line->op2.type == OP_INDIRECT_REG)
 		{
 			memoryWord memory = { 0 };
-			memory.are = (areType)ABSOLUTE;
+			memory.are = (AREKind)ARE_ABS;
 			memory.valueBits.regBits.destBits = line->op2.value;
 			memory.valueBits.regBits.srcBits = line->op1.value;
 

@@ -33,7 +33,7 @@
 /*--The numbers are assigned as the bits which will be turned on regarding the matching opType.
 typedef enum { NUMBER = 1, LABEL = 2, INDREGISTER = 4, REGISTER = 8, INVALID = -1 } opType;  Operands */
 
-/* The numbers are assigned as bit flags corresponding to each operand type. */
+/* Numbers as bit flags corresponding to each operand type. */
 typedef enum { 
     OP_NUMERIC = 1,       /* Numeric operand */
     OP_LABEL = 2,         /* Label operand */
@@ -42,8 +42,15 @@ typedef enum {
     OP_INVALID = -1       /* Invalid operand */
 } OperandType; 
 
-/*The numbers are assigned as the bits which will be turned on regarding the matching ARE type. */
-typedef enum { EXTERNAL = 1, RELOCATABLE = 2, ABSOLUTE = 4 } areType;
+/*--The numbers are assigned as the bits which will be turned on regarding the matching ARE type. 
+typedef enum { EXTERNAL = 1, RELOCATABLE = 2, ABSOLUTE = 4 } areType;*/
+
+/* A R E type as bits*/
+typedef enum { 
+    ARE_EXT = 1,          /* External */
+    ARE_RELOC = 2,        /* Relocatable */
+    ARE_ABS = 4           /* Absolute */
+} AREKind;
 
 /*-- typedef unsigned int bool;  Only get TRUE or FALSE values */
 typedef unsigned int boolean; /* TRUE or FALSE values */

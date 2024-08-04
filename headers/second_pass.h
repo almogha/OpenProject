@@ -62,7 +62,7 @@ int getOpTypeId(operandInfo op);
  * @brief Creates a memory word for a command line.
  *
  * This function creates and initializes a memory word for a given command line.
- * It sets the ARE type to ABSOLUTE and encodes the destination and source operand types and the opcode.
+ * It sets the ARE type to ARE_ABS and encodes the destination and source operand types and the opcode.
  *
  * @param line The line information containing the command and operands.
  * @return The created memory word for the command.
