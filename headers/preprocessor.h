@@ -58,17 +58,17 @@ int validMacroDeclaration(char *str, char **name, int line_count, char *file_nam
  * @param head Pointer to the head of the linked list.
  * @return 1 if macros were successfully added, 0 otherwise.
  */
-int addMacros(char *file_name, node **head);
+int addMacros(char *file_name, MacroNode **head);
 
 /**
  * @brief Replaces a macro with its content in a string.
  *
  * This function searches for a macro in the given string and replaces it with its content.
  * @param str The string containing the macro.
- * @param macr Pointer to the macro node.
+ * @param macr Pointer to the macro MacroNode.
  * @return A new string with the macro replaced, or NULL if the macro was not found.
  */
-char *replaceMacro(char *str, node *macr);
+char *replaceMacro(char *str, MacroNode *macr);
 
 /**
  * @brief Processes macro calls in the input file and replaces them with their corresponding content.
@@ -79,7 +79,7 @@ char *replaceMacro(char *str, node *macr);
  * @param input_file The name of the input file to process.
  * @param head The head of the linked list containing macros and their content.
  */
-void processMacroCalls(char *input_file, node *head);
+void processMacroCalls(char *input_file, MacroNode *head);
 
 /**
  * @brief Executes macro processing on the given file.

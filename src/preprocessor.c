@@ -62,7 +62,7 @@ int validMacroDeclaration(char *str, char **name, int line_count, char *file_nam
     return 1;
 }
 
-int addMacros(char *file_name, node **head)
+int addMacros(char *file_name, MacroNode **head)
 {
     FILE *fp = fopen(file_name, "r");
     char str[LINE_MAX_LENGTH];
@@ -100,7 +100,7 @@ int addMacros(char *file_name, node **head)
     return 1;
 }
 
-char *replaceMacro(char *str, node *macr)
+char *replaceMacro(char *str, MacroNode *macr)
 {
     char *pos = strstr(str, macr->name);
     size_t new_len;
@@ -119,14 +119,14 @@ char *replaceMacro(char *str, node *macr)
     return new_str;
 }
 
-void processMacroCalls(char *input_file, node *head)
+void processMacroCalls(char *input_file, MacroNode *head)
 {
     FILE *fp_in = fopen(input_file, "r"); /* Open the input file for reading. */
     FILE *fp_out = fopen("temp_output_file", "w"); /* Open a temporary file for writing. */
     char str[LINE_MAX_LENGTH];
     char *modified_str;
     char *token;
-    node *current;
+    MacroNode *current;
 
     if (!fp_in || !fp_out)
     {
@@ -179,7 +179,7 @@ void processMacroCalls(char *input_file, node *head)
 
 int macroExecute(char *file_name)
 {
-    node *head = NULL;
+    MacroNode *head = NULL;
     char *new_file_name = addNewFile(file_name, ".am"); /* Create the new .am file name. */
 
     if (!addMacros(file_name, &head))

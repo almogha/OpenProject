@@ -56,13 +56,21 @@ typedef enum {
 typedef unsigned int boolean; /* TRUE or FALSE values */
 
 
-typedef struct node /* Node Structure */
+/*--typedef struct node  Node Structure
 {
-    char *name; /* The name of the macro. */
-    char *content; /* The content of the macro. */
-    int line; /* The line number where the macro is defined. */
-    struct node *next; /* Pointer to the next node in the list. */
-} node;
+    char *name;
+    char *content;
+    int line;
+    struct node *next;
+} node; */
+
+/* Macro Node Structure */
+typedef struct macroNode{
+    char *name;                 /* Macro identifier. */
+    int line;                   /* Line number where the macro is declared. */
+    char *content;              /* Macro definition. */
+    struct macroNode *next;     /* Link to the next macro node. */
+} MacroNode;
 
 typedef struct /* Command Structure */
 {

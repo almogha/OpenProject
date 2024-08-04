@@ -15,19 +15,19 @@ char *stringDuplicate(const char *original)
     return duplicate;
 }
 
-void addToTheList(node **head, char *name, char *content, int line)
+void addToTheList(MacroNode **head, char *name, char *content, int line)
 {
-    node *new_node = (node *)malloc(sizeof(node)); /* Allocate memory for a new node. */
+    MacroNode *new_node = (MacroNode *)malloc(sizeof(MacroNode)); /* Allocate memory for a new MacroNode. */
     if (!new_node)
     {
-        fprintf(stdout, "ERROR: Failed to allocate memory for new node.\n");
+        fprintf(stdout, "ERROR: Failed to allocate memory for new MacroNode.\n");
         exit(EXIT_FAILURE);
     }
     new_node->name = stringDuplicate(name); /* Duplicate the name string. */
     new_node->content = stringDuplicate(content); /* Duplicate the content string. */
     new_node->line = line;
     new_node->next = *head;
-    *head = new_node; /* Insert the new node at the beginning of the list. */
+    *head = new_node; /* Insert the new MacroNode at the beginning of the list. */
 }
 
 void printError(int lineNum, const char *format, ...)
@@ -40,16 +40,16 @@ void printError(int lineNum, const char *format, ...)
     va_end(args);
 }
 
-void freeList(node *head)
+void freeList(MacroNode *head)
 {
-    node *temp;
+    MacroNode *temp;
     while (head)
     {
         temp = head;
         head = head->next;
         free(temp->name); /* Free the memory allocated for the name. */
         free(temp->content); /* Free the memory allocated for the content. */
-        free(temp); /* Free the node itself. */
+        free(temp); /* Free the MacroNode itself. */
     }
 }
 

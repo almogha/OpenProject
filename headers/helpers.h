@@ -15,13 +15,13 @@
 char *stringDuplicate(const char *original);
 
 /**
- * Adds a new node to the beginning of a linked list.
+ * Adds a new MacroNode to the beginning of a linked list.
  * @param head A pointer to the head of the linked list.
- * @param name The name to be stored in the new node.
- * @param content The content to be stored in the new node.
- * @param line The line number associated with the node.
+ * @param name The name to be stored in the new MacroNode.
+ * @param content The content to be stored in the new MacroNode.
+ * @param line The line number associated with the MacroNode.
  */
-void addToTheList(node **head, char *name, char *content, int line);
+void addToTheList(MacroNode **head, char *name, char *content, int line);
 
 /**
  * Prints an error message with the line number.
@@ -35,7 +35,7 @@ void printError(int lineNum, const char *format, ...);
  * Frees all nodes in a linked list.
  * @param head A pointer to the head of the linked list to be freed.
  */
-void freeList(node *head);
+void freeList(MacroNode *head);
 
 /**
  * Searches for a label in the global label array and returns a pointer to it if found.
