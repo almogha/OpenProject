@@ -19,4 +19,12 @@
  */
 void logAndExitOnInternalError(const char *message);
 
+/**
+ * Prints an error message with the line number.
+ * @param lineNum The line number where the error occurred.
+ * @param format The format string for the error message.
+ * @param ... Additional arguments for the format string.
+ */
+void printError(int lineNum, const char *format, ...);
+
 #endif

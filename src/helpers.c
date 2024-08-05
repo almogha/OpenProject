@@ -31,15 +31,7 @@ void addToTheList(MacroNode **head, char *name, char *content, int line)
     *head = new_node; /* Insert the new MacroNode at the beginning of the list. */
 }
 
-void printError(int lineNum, const char *format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    printf("At line %d: ", lineNum); /* Print the error message with the line number. */
-    vprintf(format, args); /* Print the formatted error message. */
-    printf("\n");
-    va_end(args);
-}
+
 
 void freeList(MacroNode *head)
 {

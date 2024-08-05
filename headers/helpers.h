@@ -23,14 +23,6 @@ char *stringDuplicate(const char *original);
 void addToTheList(MacroNode **head, char *name, char *content, int line);
 
 /**
- * Prints an error message with the line number.
- * @param lineNum The line number where the error occurred.
- * @param format The format string for the error message.
- * @param ... Additional arguments for the format string.
- */
-void printError(int lineNum, const char *format, ...);
-
-/**
  * Frees all nodes in a linked list.
  * @param head A pointer to the head of the linked list to be freed.
  */

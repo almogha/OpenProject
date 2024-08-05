@@ -8,7 +8,7 @@
 
 void replaceMacroReferences(char *input_file, MacroNode *head)
 {
-    FILE *fp_in = fopen(input_file, "r"); /* Open the input file for reading. */
+    FILE *fp_in = fopen(input_file, "r");          /* Open the input file for reading. */
     FILE *fp_out = fopen("temp_output_file", "w"); /* Open a temporary file for writing. */
     char str[LINE_MAX_LENGTH];
     char *modified_str;
@@ -57,10 +57,10 @@ void replaceMacroReferences(char *input_file, MacroNode *head)
         free(original_str);
     }
 
-    fclose(fp_in); /* Close the input file. */
+    fclose(fp_in);  /* Close the input file. */
     fclose(fp_out); /* Close the temporary file. */
 
-    remove(input_file); /* Remove the original input file. */
+    remove(input_file);                     /* Remove the original input file. */
     rename("temp_output_file", input_file); /* Rename the temporary file to the original input file. */
 }
 
@@ -85,9 +85,9 @@ int processMacros(char *file_name)
         return 0;
     }
 
-    freeList(head); /* Free the macro list. */
+    freeList(head);
     printf("Macro execution completed, output file: %s\n", new_file_name);
-    free(new_file_name); /* Free the new file name. */
+    free(new_file_name);
     return 1;
 }
 
@@ -180,7 +180,7 @@ int importMacros(char *file_name, MacroNode **head)
 
     while (fgets(str, LINE_MAX_LENGTH, fp))
     {
-        line_count++; /* Increment line count for each line read. */
+        line_count++;
         if (strcmp(strtok(str, " "), "macr") == 0)
         {
             if (!analyzeMacroDefinition(str, &name, line_count, file_name))
