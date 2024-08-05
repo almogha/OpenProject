@@ -14,5 +14,5 @@ rm double_macro.ob double_macro.am valid_01.am valid_01.ob valid_02.am valid_02.
 ./checkc.sh
 ./checki.sh
 
-# rm course_example.am course_example.ob course_example.ent course_example.ext invalid_01.am invalid_02.am
-# rm double_macro.ob double_macro.am valid_01.am valid_01.ob valid_02.am valid_02.ob valid_02.ent valid_02.ext
+rm course_example.am course_example.ob course_example.ent course_example.ext invalid_01.am invalid_02.am
+rm double_macro.ob double_macro.am valid_01.am valid_01.ob valid_02.am valid_02.ob valid_02.ent valid_02.ext
