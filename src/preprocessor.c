@@ -4,6 +4,7 @@
 #include "errors.h"
 #include "helpers.h"
 
+
 char *allocateMemory(size_t size)
 {
     char *ptr = (char *)malloc(size);
@@ -58,11 +59,11 @@ int analyzeMacroDefinition(char *str, char **name, int line_count, char *file_na
 
 int importMacros(char *file_name, MacroNode **head)
 {
-    FILE *fp = fopen(file_name, "r");
+    int line_count = 0;
     char str[LINE_MAX_LENGTH];
     char *name, *content;
-    int line_count = 0;
     fpos_t pos;
+    FILE *fp = fopen(file_name, "r");
 
     if (!fp)
     {
@@ -97,19 +98,21 @@ int importMacros(char *file_name, MacroNode **head)
 char *substitutePlaceholder(char *str, MacroNode *macr)
 {
     char *pos = strstr(str, macr->name);
-    size_t new_len;
-    char *new_str;
+    size_t new_len;  /* New length of the string */
+    char *new_str;   /* New string after substitution */
 
-    if (!pos)
+    if (!pos)        /* If macro name not found, return NULL */
     {
         return NULL;
     }
-    new_len = strlen(str) + strlen(macr->content) - strlen(macr->name) + 1;
-    new_str = allocateMemory(new_len);
-    strncpy(new_str, str, pos - str);
-    new_str[pos - str] = '\0';
-    strcat(new_str, macr->content); /* Concatenate macro content. */
-    strcat(new_str, pos + strlen(macr->name)); /* Concatenate remaining string. */
+
+    new_len = strlen(str) + strlen(macr->content) - strlen(macr->name) + 1;  /* Calculate new length */
+    new_str = allocateMemory(new_len);                                       /* Allocate memory for new string */
+    strncpy(new_str, str, pos - str);                                        /* Copy part before macro name */
+    new_str[pos - str] = '\0';                                               /* Null-terminate the copied part */
+    strcat(new_str, macr->content);                                          /* Concatenate macro content */
+    strcat(new_str, pos + strlen(macr->name));                               /* Concatenate part after macro name */
+
     return new_str;
 }
 
