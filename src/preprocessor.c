@@ -3,118 +3,8 @@
 #include "main.h"
 #include "errors.h"
 #include "helpers.h"
+#include "preprocessor.h"
 
-
-char *allocateMemory(size_t size)
-{
-    char *ptr = (char *)malloc(size);
-    if (!ptr)
-    {
-        logAndExitOnInternalError("ERROR: Allocation of memory failed");
-    }
-    return ptr;
-}
-
-char *extractMacroData(FILE *fp, fpos_t *pos, int *line_count)
-{
-    char str[LINE_MAX_LENGTH];
-    int macro_length = 0;
-    char *macro;
-
-    fsetpos(fp, pos);
-    while (fgets(str, LINE_MAX_LENGTH, fp) && strcmp(str, "endmacr\n") != 0)
-    {
-        (*line_count)++;             /* Increment line count for each line read. */
-        macro_length += strlen(str); /* Calculate total length of the macro. */
-    }
-    fsetpos(fp, pos);
-
-    if (feof(fp))
-    {
-        logAndExitOnInternalError("ERROR: Cant find macro ending");
-        return NULL;
-    }
-
-    macro = allocateMemory(macro_length + 1);
-    macro[0] = '\0';
-    while (fgets(str, LINE_MAX_LENGTH, fp) && strcmp(str, "endmacr\n") != 0)
-    {
-        strcat(macro, str);
-    }
-    return macro;
-}
-
-int analyzeMacroDefinition(char *str, char **name, int line_count, char *file_name)
-{
-    char *temp_name = strtok(NULL, " \n");
-    if (!temp_name)
-    {
-        logAndExitOnInternalError("ERROR:  Word cant be found in macro");
-        return 0;
-    }
-    *name = allocateMemory(strlen(temp_name) + 1);
-    strcpy(*name, temp_name);
-    return 1;
-}
-
-int importMacros(char *file_name, MacroNode **head)
-{
-    int line_count = 0;
-    char str[LINE_MAX_LENGTH];
-    char *name, *content;
-    fpos_t pos;
-    FILE *fp = fopen(file_name, "r");
-
-    if (!fp)
-    {
-        logAndExitOnInternalError("ERROR: Failed to open file");
-        return 0;
-    }
-
-    while (fgets(str, LINE_MAX_LENGTH, fp))
-    {
-        line_count++; /* Increment line count for each line read. */
-        if (strcmp(strtok(str, " "), "macr") == 0)
-        {
-            if (!analyzeMacroDefinition(str, &name, line_count, file_name))
-            {
-                fclose(fp);
-                return 0;
-            }
-            fgetpos(fp, &pos);
-            content = extractMacroData(fp, &pos, &line_count);
-            if (!content)
-            {
-                fclose(fp);
-                return 0;
-            }
-            addToTheList(head, name, content, line_count);
-        }
-    }
-    fclose(fp);
-    return 1;
-}
-
-char *substitutePlaceholder(char *str, MacroNode *macr)
-{
-    char *pos = strstr(str, macr->name);
-    size_t new_len;  /* New length of the string */
-    char *new_str;   /* New string after substitution */
-
-    if (!pos)        /* If macro name not found, return NULL */
-    {
-        return NULL;
-    }
-
-    new_len = strlen(str) + strlen(macr->content) - strlen(macr->name) + 1;  /* Calculate new length */
-    new_str = allocateMemory(new_len);                                       /* Allocate memory for new string */
-    strncpy(new_str, str, pos - str);                                        /* Copy part before macro name */
-    new_str[pos - str] = '\0';                                               /* Null-terminate the copied part */
-    strcat(new_str, macr->content);                                          /* Concatenate macro content */
-    strcat(new_str, pos + strlen(macr->name));                               /* Concatenate part after macro name */
-
-    return new_str;
-}
 
 void replaceMacroReferences(char *input_file, MacroNode *head)
 {
@@ -198,5 +88,116 @@ int processMacros(char *file_name)
     freeList(head); /* Free the macro list. */
     printf("Macro execution completed, output file: %s\n", new_file_name);
     free(new_file_name); /* Free the new file name. */
+    return 1;
+}
+
+char *substitutePlaceholder(char *str, MacroNode *macr)
+{
+    char *pos = strstr(str, macr->name);
+    size_t new_len;  /* New length of the string */
+    char *new_str;   /* New string after substitution */
+
+    if (!pos)        /* If macro name not found, return NULL */
+    {
+        return NULL;
+    }
+
+    new_len = strlen(str) + strlen(macr->content) - strlen(macr->name) + 1;  /* Calculate new length */
+    new_str = allocateMemory(new_len);                                       /* Allocate memory for new string */
+    strncpy(new_str, str, pos - str);                                        /* Copy part before macro name */
+    new_str[pos - str] = '\0';                                               /* Null-terminate the copied part */
+    strcat(new_str, macr->content);                                          /* Concatenate macro content */
+    strcat(new_str, pos + strlen(macr->name));                               /* Concatenate part after macro name */
+
+    return new_str;
+}
+
+char *extractMacroData(FILE *fp, fpos_t *pos, int *line_count)
+{
+    char str[LINE_MAX_LENGTH];
+    int macro_length = 0;
+    char *macro;
+
+    fsetpos(fp, pos);
+    while (fgets(str, LINE_MAX_LENGTH, fp) && strcmp(str, "endmacr\n") != 0)
+    {
+        (*line_count)++;             /* Increment line count for each line read. */
+        macro_length += strlen(str); /* Calculate total length of the macro. */
+    }
+    fsetpos(fp, pos);
+
+    if (feof(fp))
+    {
+        logAndExitOnInternalError("ERROR: Cant find macro ending");
+        return NULL;
+    }
+
+    macro = allocateMemory(macro_length + 1);
+    macro[0] = '\0';
+    while (fgets(str, LINE_MAX_LENGTH, fp) && strcmp(str, "endmacr\n") != 0)
+    {
+        strcat(macro, str);
+    }
+    return macro;
+}
+
+int analyzeMacroDefinition(char *str, char **name, int line_count, char *file_name)
+{
+    char *temp_name = strtok(NULL, " \n");
+    if (!temp_name)
+    {
+        logAndExitOnInternalError("ERROR:  Word cant be found in macro");
+        return 0;
+    }
+    *name = allocateMemory(strlen(temp_name) + 1);
+    strcpy(*name, temp_name);
+    return 1;
+}
+
+char *allocateMemory(size_t size)
+{
+    char *ptr = (char *)malloc(size);
+    if (!ptr)
+    {
+        logAndExitOnInternalError("ERROR: Allocation of memory failed");
+    }
+    return ptr;
+}
+
+int importMacros(char *file_name, MacroNode **head)
+{
+    int line_count = 0;
+    char str[LINE_MAX_LENGTH];
+    char *name, *content;
+    fpos_t pos;
+    FILE *fp = fopen(file_name, "r");
+
+    if (!fp)
+    {
+        logAndExitOnInternalError("ERROR: Failed to open file");
+        return 0;
+    }
+
+    while (fgets(str, LINE_MAX_LENGTH, fp))
+    {
+        line_count++; /* Increment line count for each line read. */
+        if (strcmp(strtok(str, " "), "macr") == 0)
+        {
+            if (!analyzeMacroDefinition(str, &name, line_count, file_name))
+            {
+                fclose(fp);
+                return 0;
+            }
+            fgetpos(fp, &pos);
+            content = extractMacroData(fp, &pos, &line_count);
+            if (!content)
+            {
+                fclose(fp);
+                return 0;
+            }
+            addToTheList(head, name, content, line_count);
+        }
+    }
+    fclose(fp);
     return 1;
 }

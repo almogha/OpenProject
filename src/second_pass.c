@@ -3,6 +3,7 @@
 #include "main.h"
 #include "errors.h"
 #include "helpers.h"
+#include "second_pass.h"
 
 void updateDataLabelsAddress(int IC)
 {

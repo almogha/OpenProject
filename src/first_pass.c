@@ -3,6 +3,7 @@
 #include "main.h"
 #include "errors.h"
 #include "helpers.h"
+#include "first_pass.h"
 
 /* List of Directives */
 void parseDataDirc(lineInfo *line, int *IC, int *DC);
