@@ -4,16 +4,9 @@
 #define PREPROCESSOR_H
 
 #include "main.h"
+#include "errors.h"
+#include "helpers.h"
 
-
-/**
- * @brief Outputs an internal error message and terminates the program.
- * 
- * This function outputs an internal error message to the standard output and ends the program
- * with a failure status.
- * @param message The error message to be displayed.
- */
-void logAndExitOnInternalError(const char *message);
 
 /**
  * @brief Reserves memory and handles allocation errors.

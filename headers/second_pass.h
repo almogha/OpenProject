@@ -7,6 +7,10 @@
 #ifndef SECOND_PASS_H
 #define SECOND_PASS_H
 
+#include "main.h"
+#include "errors.h"
+#include "helpers.h"
+
 /**
  * @brief Updates the addresses of data labels by adding the instruction counter (IC) value.
  *

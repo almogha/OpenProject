@@ -1,6 +1,7 @@
 /* Name: Almog Hakak, ID: 211825229 */
 
 #include "main.h"
+#include "errors.h"
 #include "helpers.h"
 #include "preprocessor.h"
 #include "first_pass.h"

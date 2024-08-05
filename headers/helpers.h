@@ -4,8 +4,7 @@
 #define HELPERS_H
 
 #include "main.h"
-#include "first_pass.h"
-#include "second_pass.h"
+#include "errors.h"
 
 /**
  * Duplicates a string by allocating memory and copying the original string.

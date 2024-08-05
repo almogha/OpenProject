@@ -1,21 +1,15 @@
 /* Name: Almog Hakak, ID: 211825229 */
 
 #include "main.h"
+#include "errors.h"
 #include "helpers.h"
-#include "preprocessor.h"
-
-void logAndExitOnInternalError(const char *message)
-{
-    fprintf(stdout, "Internal Error: %s\n", message); /* Print the internal error message and exit. */
-    exit(EXIT_FAILURE);
-}
 
 char *allocateMemory(size_t size)
 {
     char *ptr = (char *)malloc(size);
     if (!ptr)
     {
-        logAndExitOnInternalError("ERROR: Failed to allocate memory");
+        logAndExitOnInternalError("ERROR: Allocation of memory failed");
     }
     return ptr;
 }
@@ -29,14 +23,14 @@ char *extractMacroData(FILE *fp, fpos_t *pos, int *line_count)
     fsetpos(fp, pos);
     while (fgets(str, LINE_MAX_LENGTH, fp) && strcmp(str, "endmacr\n") != 0)
     {
-        (*line_count)++; /* Increment line count for each line read. */
+        (*line_count)++;             /* Increment line count for each line read. */
         macro_length += strlen(str); /* Calculate total length of the macro. */
     }
     fsetpos(fp, pos);
 
     if (feof(fp))
     {
-        logAndExitOnInternalError("ERROR: No macro declaration ending found");
+        logAndExitOnInternalError("ERROR: Cant find macro ending");
         return NULL;
     }
 
@@ -44,7 +38,7 @@ char *extractMacroData(FILE *fp, fpos_t *pos, int *line_count)
     macro[0] = '\0';
     while (fgets(str, LINE_MAX_LENGTH, fp) && strcmp(str, "endmacr\n") != 0)
     {
-        strcat(macro, str); /* Concatenate each line to macro. */
+        strcat(macro, str);
     }
     return macro;
 }
@@ -54,11 +48,11 @@ int analyzeMacroDefinition(char *str, char **name, int line_count, char *file_na
     char *temp_name = strtok(NULL, " \n");
     if (!temp_name)
     {
-        logAndExitOnInternalError("ERROR: Macro declaration with no word");
+        logAndExitOnInternalError("ERROR:  Word cant be found in macro");
         return 0;
     }
     *name = allocateMemory(strlen(temp_name) + 1);
-    strcpy(*name, temp_name); /* Copy the macro name. */
+    strcpy(*name, temp_name);
     return 1;
 }
 

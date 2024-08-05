@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "preprocessor.h": "c",
+        "helpers.h": "c",
+        "errors.h": "c"
+    }
+}
