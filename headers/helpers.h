@@ -265,17 +265,17 @@ void createEntriesFile(char *name);
  * Creates the extern file (.ext) with the given name, containing addresses for extern label operands.
  * @param name The base name of the file.
  * @param linesArr The array of line information structures.
- * @param linesFound The number of lines found.
+ * @param linesCount The number of lines found.
  */
-void createExternFile(char *name, lineInfo *linesArr, int linesFound);
+void createExternFile(char *name, lineInfo *linesArr, int linesCount);
 
 /**
  * Resets all global variables and frees all allocated memory blocks.
  * @param linesArr The array of line information structures.
- * @param linesFound The number of lines found.
+ * @param linesCount The number of lines found.
  * @param dataCount The number of data items.
  */
-void clearData(lineInfo *linesArr, int linesFound, int dataCount);
+void clearData(lineInfo *linesArr, int linesCount, int dataCount);
 
 /**
  * Parses a file after macro expansion and processes it to generate the necessary output files.

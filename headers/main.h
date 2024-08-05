@@ -137,30 +137,30 @@ extern const command g_cmdArr[];
  * Each `labelInfo` structure contains details like the label's address, name, and flags
  * indicating if it is external or associated with data.
  */
-extern labelInfo g_labelArr[LABELS_MAX];
+extern labelInfo g_labelsArr[LABELS_MAX];
 
 /**
  * @brief Declares an external array of pointers to `lineInfo` structures.
  * This array holds pointers to lines that define entry labels.
  */
-extern lineInfo *g_entryLines[LABELS_MAX];
+extern lineInfo *g_entryLinesArr[LABELS_MAX];
 
 /**
  * @brief Declares an external integer variable to track the number of labels.
- * This variable keeps track of the number of labels currently stored in `g_labelArr`.
+ * This variable keeps track of the number of labels currently stored in `g_labelsArr`.
  */
-extern int g_labelNum;
+extern int g_labelCount;
 
 /**
  * @brief Declares an external integer variable to track the number of entry labels.
- * This variable keeps track of the number of entry labels currently stored in `g_entryLines`.
+ * This variable keeps track of the number of entry labels currently stored in `g_entryLinesArr`.
  */
-extern int g_entryLabelsNum;
+extern int g_entryLabelsCount;
 
 /**
  * @brief Declares an external array of integers to store numerical data.
  * This array stores the numerical data values encountered during the assembly process.
  */
-extern int g_dataArr[RAM_LIMIT];
+extern int g_arr[RAM_LIMIT];
 
 #endif

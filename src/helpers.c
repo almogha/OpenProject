@@ -59,11 +59,11 @@ labelInfo *getLabel(char *labelName)
 
     if (labelName)
     {
-        for (i = 0; i < g_labelNum; i++)
+        for (i = 0; i < g_labelCount; i++)
         {
-            if (strcmp(labelName, g_labelArr[i].name) == 0)
+            if (strcmp(labelName, g_labelsArr[i].name) == 0)
             {
-                return &g_labelArr[i]; /* Return a pointer to the label if found. */
+                return &g_labelsArr[i]; /* Return a pointer to the label if found. */
             }
         }
     }
@@ -291,9 +291,9 @@ boolean isExistingEntryLabel(char *labelName)
 
     if (labelName)
     {
-        for (i = 0; i < g_entryLabelsNum; i++)
+        for (i = 0; i < g_entryLabelsCount; i++)
         {
-            if (strcmp(labelName, g_entryLines[i]->lineStr) == 0)
+            if (strcmp(labelName, g_entryLinesArr[i]->lineStr) == 0)
             {
                 return TRUE; /* Return true if the label is an existing entry label. */
             }
@@ -590,7 +590,7 @@ void createEntriesFile(char *name)
     FILE *file;
     char *base_name;
 
-    if (!g_entryLabelsNum)
+    if (!g_entryLabelsCount)
     {
         return; /* Return if there are no entry labels. */
     }
@@ -598,12 +598,12 @@ void createEntriesFile(char *name)
     base_name = stripExtension(name, ".am"); /* Creates the new ".ent" file without the ".am" extension. */
     file = openFile(base_name, ".ent", "w");
 
-    for (i = 0; i < g_entryLabelsNum; i++)
+    for (i = 0; i < g_entryLabelsCount; i++)
     {
-        fprintf(file, "%s\t\t", g_entryLines[i]->lineStr); /* Print the entry label name. */
-        fprintfEnt(file, getLabel(g_entryLines[i]->lineStr)->address); /* Print the entry label address. */
+        fprintf(file, "%s\t\t", g_entryLinesArr[i]->lineStr); /* Print the entry label name. */
+        fprintfEnt(file, getLabel(g_entryLinesArr[i]->lineStr)->address); /* Print the entry label address. */
 
-        if (i != g_entryLabelsNum - 1)
+        if (i != g_entryLabelsCount - 1)
         {
             fprintf(file, "\n");
         }
@@ -612,7 +612,7 @@ void createEntriesFile(char *name)
     fclose(file);
 }
 
-void createExternFile(char *name, lineInfo *linesArr, int linesFound)
+void createExternFile(char *name, lineInfo *linesArr, int linesCount)
 {
     int i;
     labelInfo *label;
@@ -620,7 +620,7 @@ void createExternFile(char *name, lineInfo *linesArr, int linesFound)
     FILE *file = NULL;
     char *base_name;
 
-    for (i = 0; i < linesFound; i++)
+    for (i = 0; i < linesCount; i++)
     {
         if (linesArr[i].cmd && linesArr[i].cmd->numOfParams >= 2 && linesArr[i].op1.type == OP_LABEL)
         {
@@ -671,30 +671,30 @@ void createExternFile(char *name, lineInfo *linesArr, int linesFound)
     }
 }
 
-void clearData(lineInfo *linesArr, int linesFound, int dataCount)
+void clearData(lineInfo *linesArr, int linesCount, int dataCount)
 {
     int i;
 
-    for (i = 0; i < g_labelNum; i++)
+    for (i = 0; i < g_labelCount; i++)
     {
-        g_labelArr[i].address = 0;
-        g_labelArr[i].isData = 0;
-        g_labelArr[i].isExtern = 0;
+        g_labelsArr[i].address = 0;
+        g_labelsArr[i].isData = 0;
+        g_labelsArr[i].isExtern = 0;
     }
-    g_labelNum = 0;
+    g_labelCount = 0;
 
-    for (i = 0; i < g_entryLabelsNum; i++)
+    for (i = 0; i < g_entryLabelsCount; i++)
     {
-        g_entryLines[i] = NULL;
+        g_entryLinesArr[i] = NULL;
     }
-    g_entryLabelsNum = 0;
+    g_entryLabelsCount = 0;
 
     for (i = 0; i < dataCount; i++)
     {
-        g_dataArr[i] = 0;
+        g_arr[i] = 0;
     }
 
-    for (i = 0; i < linesFound; i++)
+    for (i = 0; i < linesCount; i++)
     {
         free(linesArr[i].originalString); /* Free the original string allocated for each line. */
     }
@@ -706,9 +706,9 @@ void parseFile(char *fileName)
     FILE *file;
     lineInfo linesArr[LINES_MAX_LENGTH];
     int memoryArr[RAM_LIMIT] = { 0 };
-    int IC = 0, DC = 0, numOfErrors = 0, linesFound = 0;
+    int IC = 0, DC = 0, errorsCount = 0, linesCount = 0;
 
-    clearData(linesArr, linesFound, IC + DC); /* Clear the data and reset global variables. */
+    clearData(linesArr, linesCount, IC + DC); /* Clear the data and reset global variables. */
     sprintf(amFileName, "%s", fileName);
 
     file = fopen(amFileName, "r"); /* Open the file for reading. */
@@ -718,24 +718,24 @@ void parseFile(char *fileName)
         return;
     }
 
-    numOfErrors += firstPass(file, linesArr, &linesFound, &IC, &DC); /* Perform the first transition read. */
-    numOfErrors += secondPass(memoryArr, linesArr, linesFound, IC, DC); /* Perform the second transition read. */
+    errorsCount += firstPass(file, linesArr, &linesCount, &IC, &DC); /* Perform the first transition read. */
+    errorsCount += secondPass(memoryArr, linesArr, linesCount, IC, DC); /* Perform the second transition read. */
 	printf("Phase 3: Start the second pass\n");
 
-    if (numOfErrors == 0)
+    if (errorsCount == 0)
     {
         createObjectFile(fileName, IC, DC, memoryArr); /* Create the object file. */
-        createExternFile(fileName, linesArr, linesFound); /* Create the extern file. */
+        createExternFile(fileName, linesArr, linesCount); /* Create the extern file. */
         createEntriesFile(fileName); /* Create the entries file. */
         printf("[Info] Created output files for the file \"%s\".\n\n", fileName);
     }
     else
     {
-        printf("[Info] A total number of %d error%s found in \"%s\".\n", numOfErrors, (numOfErrors > 1) ? "s were" : " was", fileName);
+        printf("[Info] A total number of %d error%s found in \"%s\".\n", errorsCount, (errorsCount > 1) ? "s were" : " was", fileName);
 		printf("[Info] Found errors in \".am\" file, no output files created.\n\n");
     }
 
-    clearData(linesArr, linesFound, IC + DC); /* Clear the data and reset global variables. */
+    clearData(linesArr, linesCount, IC + DC); /* Clear the data and reset global variables. */
     fclose(file);
 }
 

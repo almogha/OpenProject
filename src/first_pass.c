@@ -55,10 +55,10 @@ labelInfo *addLabelToArr(labelInfo label, lineInfo *line) /* Documentation in "a
 		return NULL;
 	}
 	strcpy(label.name, line->lineStr); /* Add the name to the label. */
-	if (g_labelNum < LABELS_MAX) /* Add the label to g_labelArr and to the lineInfo. */
+	if (g_labelCount < LABELS_MAX) /* Add the label to g_labelsArr and to the lineInfo. */
 	{
-		g_labelArr[g_labelNum] = label;
-		return &g_labelArr[g_labelNum++];
+		g_labelsArr[g_labelCount] = label;
+		return &g_labelsArr[g_labelCount++];
 	}
 	
 	printError(line->lineNum, "ERROR: Too many labels - max is %d.", LABELS_MAX, TRUE); /* Too many labels. */
@@ -68,9 +68,9 @@ labelInfo *addLabelToArr(labelInfo label, lineInfo *line) /* Documentation in "a
 
 boolean addNumberToData(int num, int *IC, int *DC, int lineNum) /* Documentation in "assembler.h". */
 {
-	if (*DC + *IC < RAM_LIMIT) /* Checks if there is enough space in g_dataArr for the data. */
+	if (*DC + *IC < RAM_LIMIT) /* Checks if there is enough space in g_arr for the data. */
 	{
-		g_dataArr[(*DC)++] = num;
+		g_arr[(*DC)++] = num;
 	}
 	else
 	{
@@ -116,7 +116,7 @@ char *findLabel(lineInfo *line, int IC) /* Documentation in "assembler.h". */
 
 void removeLastLabel(int lineNum) /* Documentation in "assembler.h". */
 {
-	g_labelNum--;
+	g_labelCount--;
 	printf("WARNING: At line %d: The assembler ignored the label before the directive.\n", lineNum);
 }
 
@@ -139,7 +139,7 @@ void parseDataDirc(lineInfo *line, int *IC, int *DC) /* Documentation in "assemb
 		return;
 	}
 
-	INFINITE_LOOP /* Find all the params and add them to g_dataArr */
+	INFINITE_LOOP /* Find all the params and add them to g_arr */
 	{
 		if (isWhiteSpaces(line->lineStr)) /* Get next param or break if there is none. */
 		{
@@ -147,7 +147,7 @@ void parseDataDirc(lineInfo *line, int *IC, int *DC) /* Documentation in "assemb
 		}
 		operandTok = getFirstOperand(line->lineStr, &endOfOp, &foundComma);
 		
-		if (isLegalNum(operandTok, WORD_LENGTH - 3, line->lineNum, &operandValue)) /* Add the param to g_dataArr. */
+		if (isLegalNum(operandTok, WORD_LENGTH - 3, line->lineNum, &operandValue)) /* Add the param to g_arr. */
 		{
 			if (!addNumberToData(operandValue, IC, DC, line->lineNum))
 			{
@@ -230,9 +230,9 @@ void parseEntryDirc(lineInfo *line) /* Documentation in "assembler.h". */
 			printError(line->lineNum, "ERROR: Label already defined as an entry label.");
 			line->isError = TRUE;
 		}
-		if (g_entryLabelsNum < LABELS_MAX)
+		if (g_entryLabelsCount < LABELS_MAX)
 		{
-			g_entryLines[g_entryLabelsNum++] = line;
+			g_entryLinesArr[g_entryLabelsCount++] = line;
 		}
 	}
 }
@@ -512,26 +512,26 @@ boolean readLine(FILE *file, char *line_data, size_t maxLength) /* Documentation
 	return TRUE;
 }
 
-int firstPass(FILE *file, lineInfo *linesArr, int *linesFound, int *IC, int *DC) /* Documentation in "assembler.h". */
+int firstPass(FILE *file, lineInfo *linesArr, int *linesCount, int *IC, int *DC) /* Documentation in "assembler.h". */
 {
 	char lineStr[LINE_MAX_LENGTH + 2]; /* +2 for the \n and \0 at the end */
 	int errorsFound = 0;
-	*linesFound = 0;
+	*linesCount = 0;
 
 	
 	while (!feof(file)) /* Read lines and parse them. */
 	{
 		if (readLine(file, lineStr, LINE_MAX_LENGTH + 2)) 
 		{
-			if (*linesFound >= LINES_MAX_LENGTH) /* Checks if the file is too long. */
+			if (*linesCount >= LINES_MAX_LENGTH) /* Checks if the file is too long. */
 			{
 				printf("ERROR: The file is too long. Max number of lines in a file is %d.\n", LINES_MAX_LENGTH);
 				return ++errorsFound;
 			}
 
-			parseLine(&linesArr[*linesFound], lineStr, *linesFound + 1, IC, DC); /* Parse a line. */
+			parseLine(&linesArr[*linesCount], lineStr, *linesCount + 1, IC, DC); /* Parse a line. */
 
-			if (linesArr[*linesFound].isError) /* Update errorsFound. */
+			if (linesArr[*linesCount].isError) /* Update errorsFound. */
 			{
 				errorsFound++;
 			}
@@ -539,18 +539,18 @@ int firstPass(FILE *file, lineInfo *linesArr, int *linesFound, int *IC, int *DC)
 			if (*IC + *DC >= RAM_LIMIT) /* Check if the number of memory words needed is small enough. */
 			{
 				
-				printError(*linesFound + 1, "ERROR: The max memory words is %d, too much data and code.", RAM_LIMIT); /* dataArr is full. Stop reading the file. */
+				printError(*linesCount + 1, "ERROR: The max memory words is %d, too much data and code.", RAM_LIMIT); /* dataArr is full. Stop reading the file. */
 				printf("Memory is full, file reading terminated.\n");
 				return ++errorsFound;
 			}
-			++*linesFound;
+			++*linesCount;
 		}
 		else if (!feof(file))
 		{
 			
-			printError(*linesFound + 1, "ERROR: The max line length is %d, line is too long.", LINE_MAX_LENGTH); /* Line is too long. */
+			printError(*linesCount + 1, "ERROR: The max line length is %d, line is too long.", LINE_MAX_LENGTH); /* Line is too long. */
 			errorsFound++;
-			 ++*linesFound;
+			 ++*linesCount;
 		}
 	}
 

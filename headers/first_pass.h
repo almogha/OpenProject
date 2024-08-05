@@ -165,11 +165,11 @@ boolean readLine(FILE *file, char *line_data, size_t maxLength);
  * It updates the instruction counter (IC), data counter (DC), and line information array (linesArr).
  * @param file The file pointer to the source file.
  * @param linesArr The array to store parsed line information.
- * @param linesFound A pointer to the number of lines found.
+ * @param linesCount A pointer to the number of lines found.
  * @param IC A pointer to the instruction counter.
  * @param DC A pointer to the data counter.
  * @return Returns the number of errors found during the first pass.
  */
-int firstPass(FILE *file, lineInfo *linesArr, int *linesFound, int *IC, int *DC);
+int firstPass(FILE *file, lineInfo *linesArr, int *linesCount, int *IC, int *DC);
 
 #endif

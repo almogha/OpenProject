@@ -7,11 +7,11 @@ void updateDataLabelsAddress(int IC)
 {
 	int i;
 
-	for (i = 0; i < g_labelNum; i++)
+	for (i = 0; i < g_labelCount; i++)
 	{
-		if (g_labelArr[i].isData)
+		if (g_labelsArr[i].isData)
 		{
-			g_labelArr[i].address += IC; /* Update the address for data labels by adding IC. */
+			g_labelsArr[i].address += IC; /* Update the address for data labels by adding IC. */
 		}
 	}
 }
@@ -21,20 +21,20 @@ int countIllegalEntries()
 	int i, ret = 0;
 	labelInfo *label;
 
-	for (i = 0; i < g_entryLabelsNum; i++)
+	for (i = 0; i < g_entryLabelsCount; i++)
 	{
-		label = getLabel(g_entryLines[i]->lineStr);
+		label = getLabel(g_entryLinesArr[i]->lineStr);
 		if (label)
 		{
 			if (label->isExtern)
 			{
-				printError(g_entryLines[i]->lineNum, "The parameter for .entry can't be an external label.");
+				printError(g_entryLinesArr[i]->lineNum, "The parameter for .entry can't be an external label.");
 				ret++; /* Increment the error count for illegal entry labels. */
 			}
 		}
 		else
 		{
-			printError(g_entryLines[i]->lineNum, "No such label as \"%s\".", g_entryLines[i]->lineStr);
+			printError(g_entryLinesArr[i]->lineNum, "No such label as \"%s\".", g_entryLinesArr[i]->lineStr);
 			ret++; /* Increment the error count for non-existing labels. */
 		}
 	}
@@ -227,7 +227,7 @@ void addDataToMemory(int *memoryArr, int *memoryCounter, int DC)
 	{
 		if (*memoryCounter < RAM_LIMIT)
 		{
-			memoryArr[(*memoryCounter)++] = mask & g_dataArr[i]; /* Add data to memory array with mask applied. */
+			memoryArr[(*memoryCounter)++] = mask & g_arr[i]; /* Add data to memory array with mask applied. */
 		}
 		else
 		{
