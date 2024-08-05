@@ -720,19 +720,18 @@ void parseFile(char *fileName)
 
     errorsCount += firstPass(file, linesArr, &linesCount, &IC, &DC); /* Perform the first transition read. */
     errorsCount += secondPass(memoryArr, linesArr, linesCount, IC, DC); /* Perform the second transition read. */
-	printf("Phase 3: Start the second pass\n");
+	printf("Starting second pass\n");
 
     if (errorsCount == 0)
     {
         createObjectFile(fileName, IC, DC, memoryArr); /* Create the object file. */
         createExternFile(fileName, linesArr, linesCount); /* Create the extern file. */
         createEntriesFile(fileName); /* Create the entries file. */
-        printf("[Info] Created output files for the file \"%s\".\n\n", fileName);
+        printf("Output were created for file %s.\n\n", fileName);
     }
     else
     {
-        printf("[Info] A total number of %d error%s found in \"%s\".\n", errorsCount, (errorsCount > 1) ? "s were" : " was", fileName);
-		printf("[Info] Found errors in \".am\" file, no output files created.\n\n");
+        printf("Number of Errors: %d found in %s.\n", errorsCount, fileName);
     }
 
     clearData(linesArr, linesCount, IC + DC); /* Clear the data and reset global variables. */
