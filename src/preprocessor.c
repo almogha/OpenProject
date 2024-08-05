@@ -4,6 +4,7 @@
 #include "errors.h"
 #include "helpers.h"
 
+
 char *allocateMemory(size_t size)
 {
     char *ptr = (char *)malloc(size);
