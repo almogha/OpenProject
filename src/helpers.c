@@ -7,7 +7,7 @@
 char *stringDuplicate(const char *original)
 {
     size_t length = strlen(original) + 1;
-    char *duplicate = mallocAllocateAndCheck(length); /* Allocate memory for the new string. */
+    char *duplicate = allocateMemory(length); /* Allocate memory for the new string. */
     if (duplicate)
     {
         strcpy(duplicate, original); /* Copy the original string to the newly allocated memory. */
@@ -700,49 +700,10 @@ void clearData(lineInfo *linesArr, int linesCount, int dataCount)
     }
 }
 
-void parseFile(char *fileName)
-{
-    char amFileName[FILENAME_MAX_LENGTH];
-    FILE *file;
-    lineInfo linesArr[LINES_MAX_LENGTH];
-    int memoryArr[RAM_LIMIT] = { 0 };
-    int IC = 0, DC = 0, errorsCount = 0, linesCount = 0;
-
-    clearData(linesArr, linesCount, IC + DC); /* Clear the data and reset global variables. */
-    sprintf(amFileName, "%s", fileName);
-
-    file = fopen(amFileName, "r"); /* Open the file for reading. */
-    if (file == NULL)
-    {
-        printf("ERROR: Can't open the file \"%s\".\n", amFileName);
-        return;
-    }
-
-    errorsCount += firstPass(file, linesArr, &linesCount, &IC, &DC); /* Perform the first transition read. */
-    errorsCount += secondPass(memoryArr, linesArr, linesCount, IC, DC); /* Perform the second transition read. */
-	printf("Phase 3: Start the second pass\n");
-
-    if (errorsCount == 0)
-    {
-        createObjectFile(fileName, IC, DC, memoryArr); /* Create the object file. */
-        createExternFile(fileName, linesArr, linesCount); /* Create the extern file. */
-        createEntriesFile(fileName); /* Create the entries file. */
-        printf("[Info] Created output files for the file \"%s\".\n\n", fileName);
-    }
-    else
-    {
-        printf("[Info] A total number of %d error%s found in \"%s\".\n", errorsCount, (errorsCount > 1) ? "s were" : " was", fileName);
-		printf("[Info] Found errors in \".am\" file, no output files created.\n\n");
-    }
-
-    clearData(linesArr, linesCount, IC + DC); /* Clear the data and reset global variables. */
-    fclose(file);
-}
-
 char *addNewFile(char *file_name, char *new_extension)
 {
     char *dot_position, *new_file_name;
-    new_file_name = mallocAllocateAndCheck(strlen(file_name) + strlen(new_extension) + 1);
+    new_file_name = allocateMemory(strlen(file_name) + strlen(new_extension) + 1);
 
     strcpy(new_file_name, file_name);
 
@@ -764,14 +725,14 @@ int copyFile(char *file_name_dest, char *file_name_orig)
     fp = fopen(file_name_orig, "r"); /* Open the source file for reading. */
     if (fp == NULL)
     {
-        printErrorInternal("ERROR: Failed to open file for reading");
+        logAndExitOnInternalError("ERROR: Failed to open file for reading");
         return 0;
     }
 
     fp_dest = fopen(file_name_dest, "w"); /* Open the destination file for writing. */
     if (fp_dest == NULL)
     {
-        printErrorInternal("ERROR: Failed to open new file for writing");
+        logAndExitOnInternalError("ERROR: Failed to open new file for writing");
         fclose(fp);
         return 0;
     }

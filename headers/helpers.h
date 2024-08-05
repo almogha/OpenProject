@@ -278,12 +278,6 @@ void createExternFile(char *name, lineInfo *linesArr, int linesCount);
 void clearData(lineInfo *linesArr, int linesCount, int dataCount);
 
 /**
- * Parses a file after macro expansion and processes it to generate the necessary output files.
- * @param fileName The name of the file to parse.
- */
-void parseFile(char *fileName);
-
-/**
  * Creates a new file name by replacing the extension of the original file name with a new extension.
  * @param file_name The original file name.
  * @param new_extension The new extension to append to the file name.

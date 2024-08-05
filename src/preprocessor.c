@@ -4,23 +4,23 @@
 #include "helpers.h"
 #include "preprocessor.h"
 
-void printErrorInternal(const char *msg)
+void logAndExitOnInternalError(const char *message)
 {
-    fprintf(stdout, "Internal Error: %s\n", msg); /* Print the internal error message and exit. */
+    fprintf(stdout, "Internal Error: %s\n", message); /* Print the internal error message and exit. */
     exit(EXIT_FAILURE);
 }
 
-char *mallocAllocateAndCheck(size_t size)
+char *allocateMemory(size_t size)
 {
     char *ptr = (char *)malloc(size);
     if (!ptr)
     {
-        printErrorInternal("ERROR: Failed to allocate memory");
+        logAndExitOnInternalError("ERROR: Failed to allocate memory");
     }
     return ptr;
 }
 
-char *saveMacroContent(FILE *fp, fpos_t *pos, int *line_count)
+char *extractMacroData(FILE *fp, fpos_t *pos, int *line_count)
 {
     char str[LINE_MAX_LENGTH];
     int macro_length = 0;
@@ -36,11 +36,11 @@ char *saveMacroContent(FILE *fp, fpos_t *pos, int *line_count)
 
     if (feof(fp))
     {
-        printErrorInternal("ERROR: No macro declaration ending found");
+        logAndExitOnInternalError("ERROR: No macro declaration ending found");
         return NULL;
     }
 
-    macro = mallocAllocateAndCheck(macro_length + 1);
+    macro = allocateMemory(macro_length + 1);
     macro[0] = '\0';
     while (fgets(str, LINE_MAX_LENGTH, fp) && strcmp(str, "endmacr\n") != 0)
     {
@@ -49,20 +49,20 @@ char *saveMacroContent(FILE *fp, fpos_t *pos, int *line_count)
     return macro;
 }
 
-int validMacroDeclaration(char *str, char **name, int line_count, char *file_name)
+int analyzeMacroDefinition(char *str, char **name, int line_count, char *file_name)
 {
     char *temp_name = strtok(NULL, " \n");
     if (!temp_name)
     {
-        printErrorInternal("ERROR: Macro declaration with no word");
+        logAndExitOnInternalError("ERROR: Macro declaration with no word");
         return 0;
     }
-    *name = mallocAllocateAndCheck(strlen(temp_name) + 1);
+    *name = allocateMemory(strlen(temp_name) + 1);
     strcpy(*name, temp_name); /* Copy the macro name. */
     return 1;
 }
 
-int addMacros(char *file_name, MacroNode **head)
+int importMacros(char *file_name, MacroNode **head)
 {
     FILE *fp = fopen(file_name, "r");
     char str[LINE_MAX_LENGTH];
@@ -72,7 +72,7 @@ int addMacros(char *file_name, MacroNode **head)
 
     if (!fp)
     {
-        printErrorInternal("ERROR: Failed to open file");
+        logAndExitOnInternalError("ERROR: Failed to open file");
         return 0;
     }
 
@@ -81,13 +81,13 @@ int addMacros(char *file_name, MacroNode **head)
         line_count++; /* Increment line count for each line read. */
         if (strcmp(strtok(str, " "), "macr") == 0)
         {
-            if (!validMacroDeclaration(str, &name, line_count, file_name))
+            if (!analyzeMacroDefinition(str, &name, line_count, file_name))
             {
                 fclose(fp);
                 return 0;
             }
             fgetpos(fp, &pos);
-            content = saveMacroContent(fp, &pos, &line_count);
+            content = extractMacroData(fp, &pos, &line_count);
             if (!content)
             {
                 fclose(fp);
@@ -100,7 +100,7 @@ int addMacros(char *file_name, MacroNode **head)
     return 1;
 }
 
-char *replaceMacro(char *str, MacroNode *macr)
+char *substitutePlaceholder(char *str, MacroNode *macr)
 {
     char *pos = strstr(str, macr->name);
     size_t new_len;
@@ -111,7 +111,7 @@ char *replaceMacro(char *str, MacroNode *macr)
         return NULL;
     }
     new_len = strlen(str) + strlen(macr->content) - strlen(macr->name) + 1;
-    new_str = mallocAllocateAndCheck(new_len);
+    new_str = allocateMemory(new_len);
     strncpy(new_str, str, pos - str);
     new_str[pos - str] = '\0';
     strcat(new_str, macr->content); /* Concatenate macro content. */
@@ -119,7 +119,7 @@ char *replaceMacro(char *str, MacroNode *macr)
     return new_str;
 }
 
-void processMacroCalls(char *input_file, MacroNode *head)
+void replaceMacroReferences(char *input_file, MacroNode *head)
 {
     FILE *fp_in = fopen(input_file, "r"); /* Open the input file for reading. */
     FILE *fp_out = fopen("temp_output_file", "w"); /* Open a temporary file for writing. */
@@ -130,7 +130,7 @@ void processMacroCalls(char *input_file, MacroNode *head)
 
     if (!fp_in || !fp_out)
     {
-        printErrorInternal("ERROR: Failed to open file");
+        logAndExitOnInternalError("ERROR: Failed to open file");
         if (fp_in) fclose(fp_in);
         if (fp_out) fclose(fp_out);
         return;
@@ -158,7 +158,7 @@ void processMacroCalls(char *input_file, MacroNode *head)
         current = head;
         while (current != NULL)
         {
-            modified_str = replaceMacro(original_str, current); /* Replace macros in the line. */
+            modified_str = substitutePlaceholder(original_str, current); /* Replace macros in the line. */
             if (modified_str)
             {
                 strcpy(original_str, modified_str);
@@ -177,22 +177,22 @@ void processMacroCalls(char *input_file, MacroNode *head)
     rename("temp_output_file", input_file); /* Rename the temporary file to the original input file. */
 }
 
-int macroExecute(char *file_name)
+int processMacros(char *file_name)
 {
     MacroNode *head = NULL;
     char *new_file_name = addNewFile(file_name, ".am"); /* Create the new .am file name. */
 
-    if (!addMacros(file_name, &head))
+    if (!importMacros(file_name, &head))
     {
         free(new_file_name);
         return 0;
     }
 
-    processMacroCalls(file_name, head); /* Process macro calls in the file. */
+    replaceMacroReferences(file_name, head); /* Process macro calls in the file. */
 
     if (!copyFile(new_file_name, file_name))
     {
-        printErrorInternal("Failed to copy processed file to new file");
+        logAndExitOnInternalError("Failed to copy processed file to new file");
         freeList(head);
         free(new_file_name);
         return 0;

@@ -21,13 +21,14 @@ labelInfo g_labelsArr[LABELS_MAX];     /* Array of labelInfo structures to store
  */
 int main(int argc, char *argv[])
 {
-    int i;
+    int IC = 0, DC = 0, errorsCount = 0, linesCount = 0, ramArr[RAM_LIMIT] = {0}, i;
+    char *source_file, *macro_file, *temp_file, macroFileName[FILENAME_MAX_LENGTH];
+    lineInfo linesArr[LINES_MAX_LENGTH];
     FILE *file;
-    char *source_file, *macro_file, *temp_file;
 
     if (argc < 2)
     {
-        printf("ERROR: No file was given .\n");
+        printf("ERROR: No file was given.\n");
         return 1;
     }
 
@@ -45,8 +46,8 @@ int main(int argc, char *argv[])
             continue;
         }
 
-         /* Run the macro preprocessor on the temp file, handle errors in current file. */
-        if (!macroExecute(temp_file))
+        /* Run the macro preprocessor on the temp file, handle errors in current file. */
+        if (!processMacros(temp_file))
         {
             free(source_file);
             free(temp_file);
@@ -56,7 +57,7 @@ int main(int argc, char *argv[])
         printf("Starting first pass\n");
         macro_file = addNewFile(argv[i], ".am"); /* Creates a file with ".am". */
         remove(temp_file);
-        file = fopen(macro_file, "r");          /* Opens macro file in reading mode. */
+        file = fopen(macro_file, "r");           /* Opens macro file in reading mode. */
         
          /* Handling error */
         if (!file) 
@@ -67,13 +68,41 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        parseFile(macro_file); /* Parse the .am file after macro expansion and first pass. */
+        clearData(linesArr, linesCount, IC + DC); /* Reset data. */
+        sprintf(macroFileName, "%s", macro_file);
+
+        file = fopen(macroFileName, "r");
+        if (file == NULL)
+        {
+            printf("ERROR: Can't open the file \"%s\".\n", macroFileName);
+            return 1;
+        }
+
+        errorsCount += firstPass(file, linesArr, &linesCount, &IC, &DC);
+
+        printf("Starting second pass\n");
+        errorsCount += secondPass(ramArr, linesArr, linesCount, IC, DC);
+
+        if (errorsCount == 0)
+        {
+            createObjectFile(macro_file, IC, DC, ramArr);    /* .ob file creation. */
+            createExternFile(macro_file, linesArr, linesCount); /* .ext file creation. */
+            createEntriesFile(macro_file);                      /* .ent file creation. */
+            printf("Outputs were created for file %s.\n", macro_file);
+        }
+        else
+        {
+            printf("Number of Errors: %d found in %s.\n", errorsCount, macro_file);
+        }
+
+        clearData(linesArr, linesCount, IC + DC); /* Clear the data and reset global variables. */
+        fclose(file);
 
         /* Freeing the allocated memory. */
         free(source_file);
         free(macro_file);
     }
     
-    printf("Finished\n");
+    printf("Finished\n\n");
     return 0;
 }
