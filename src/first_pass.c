@@ -5,43 +5,6 @@
 #include "helpers.h"
 #include "first_pass.h"
 
-/* List of Directives */
-void parseDataDirc(lineInfo *line, int *IC, int *DC);
-void parseStringDirc(lineInfo *line, int *IC, int *DC);
-void parseExternDirc(lineInfo *line);
-void parseEntryDirc(lineInfo *line);
-
-const directive g_dircArr[] = 
-{	/* Name | Parsing Function */
-	{ "data", parseDataDirc } ,
-	{ "string", parseStringDirc } ,
-	{ "extern", parseExternDirc },
-	{ "entry", parseEntryDirc },
-	{ NULL } /* This value will represent the end of the array. */
-};	
-
-/* List of Commands form of Name, opcode, params */
-const command g_opArr[] =	
-{
-	{ "mov", 0, 2 } , 
-	{ "cmp", 1, 2 } ,
-	{ "add", 2, 2 } ,
-	{ "sub", 3, 2 } ,
-	{ "lea", 4, 2 } ,
-	{ "clr", 5, 1 } ,
-	{ "not", 6, 1 } ,
-	{ "inc", 7, 1 } ,
-	{ "dec", 8, 1 } ,
-	{ "jmp", 9, 1 } ,
-	{ "bne", 10, 1 } ,
-	{ "red", 11, 1 } ,
-	{ "prn", 12, 1 } ,
-	{ "jsr", 13, 1 } ,
-	{ "rts", 14, 0 } ,
-	{ "stop", 15, 0 } ,
-	{ NULL }
-}; 
-
 labelInfo *insertLabelIfValid(labelInfo label, lineInfo *line) /* Documentation in "assembler.h". */
 {
 	if (!isLegalLabel(line->lineStr, line->lineNum, TRUE)) /* Check if the label is legal. */

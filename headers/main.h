@@ -125,11 +125,16 @@ typedef struct /* Memory Word Structure - 15 bits */
 } memoryWord;
 
 /**
- * @brief Declares an external array of `command` structures.
- * This array holds information about the available commands in the assembler.
- * Each `command` structure typically includes the command's name, opcode, and the number of parameters it accepts.
+ * @brief List of commands and their op type.
+ * The list is in form of Name, opcode, parameters.
  */
 extern const command g_opArr[];
+
+/**
+ * @brief List of directives and their function.
+ * The list is in form of Name, Function to use.
+ */
+extern const directive g_dircArr[];
 
 /**
  * @brief Declares an external array of `labelInfo` structures.
