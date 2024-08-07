@@ -5,14 +5,13 @@
 #include "helpers.h"
 #include "first_pass.h"
 
-int initialAssemblerPass(FILE *file, lineInfo *linesArr, int *linesCount, int *IC, int *DC) /* Documentation in "assembler.h". */
+int initialAssemblerPass(FILE *file, lineInfo *linesArr, int *linesCount, int *IC, int *DC) 
 {
-	char lineStr[LINE_MAX_LENGTH + 2]; /* +2 for the \n and \0 at the end */
+	char lineStr[LINE_MAX_LENGTH + 2];
 	int errorsFound = 0;
 	*linesCount = 0;
-
 	
-	while (!feof(file)) /* Read lines and parse them. */
+	while (!feof(file))
 	{
 		if (fetchLine(file, lineStr, LINE_MAX_LENGTH + 2)) 
 		{
@@ -50,7 +49,7 @@ int initialAssemblerPass(FILE *file, lineInfo *linesArr, int *linesCount, int *I
 	return errorsFound;
 }
 
-boolean fetchLine(FILE *file, char *line_data, size_t maxLength) /* Documentation in "assembler.h". */
+boolean fetchLine(FILE *file, char *line_data, size_t maxLength) 
 {
 	char *endOfLine;
 
@@ -58,7 +57,7 @@ boolean fetchLine(FILE *file, char *line_data, size_t maxLength) /* Documentatio
 	{
 		return FALSE;
 	}
-	endOfLine = strchr(line_data, '\n'); /* Check if the line is too long (no '\n' was present). */
+	endOfLine = strchr(line_data, '\n'); /* Check if the line is too long */
 
 	if (endOfLine)
 	{
@@ -69,7 +68,8 @@ boolean fetchLine(FILE *file, char *line_data, size_t maxLength) /* Documentatio
 		char c;
 		boolean ret = (feof(file)) ? TRUE : FALSE; /* Return FALSE, unless it's the end of the file. */
 
-		do /* Keep reading chars until you reach the end of the line ('\n') or EOF. */
+		/* Keep reading chars until you reach '\n' or EOF. */
+		do 
 		{
 			c = fgetc(file);
 		} while (c != '\n' && c != EOF);
@@ -80,22 +80,22 @@ boolean fetchLine(FILE *file, char *line_data, size_t maxLength) /* Documentatio
 	return TRUE;
 }
 
-labelInfo *insertLabelIfValid(labelInfo label, lineInfo *line) /* Documentation in "assembler.h". */
+labelInfo *insertLabelIfValid(labelInfo label, lineInfo *line) 
 {
 	if (!isLegalLabel(line->lineStr, line->lineNum, TRUE)) /* Check if the label is legal. */
 	{
-		line->isError = TRUE; /* Illegal label name. */
+		line->isError = TRUE;
 		return NULL;
 	}
 	/* Checks if the label already exists. */
 	if (isExistingLabel(line->lineStr))
 	{
-		printError(line->lineNum, "ERROR: Label already exists.");
+		printError(line->lineNum, "ERROR: Label is alresdy exists.");
 		line->isError = TRUE;
 		return NULL;
 	}
 	strcpy(label.name, line->lineStr); /* Add the name to the label. */
-	if (g_labelCount < LABELS_MAX) /* Add the label to g_labelsArr and to the lineInfo. */
+	if (g_labelCount < LABELS_MAX)     /* Add the label to g_labelsArr and to the lineInfo. */
 	{
 		g_labelsArr[g_labelCount] = label;
 		return &g_labelsArr[g_labelCount++];
@@ -106,7 +106,7 @@ labelInfo *insertLabelIfValid(labelInfo label, lineInfo *line) /* Documentation 
 	return NULL;
 }
 
-boolean insertValueIntoDataArray(int num, int *IC, int *DC, int lineNum) /* Documentation in "assembler.h". */
+boolean insertValueIntoDataArray(int num, int *IC, int *DC, int lineNum) 
 {
 	if (*DC + *IC < RAM_LIMIT) /* Checks if there is enough space in g_arr for the data. */
 	{
@@ -119,7 +119,7 @@ boolean insertValueIntoDataArray(int num, int *IC, int *DC, int lineNum) /* Docu
 	return TRUE;
 }
 
-char *locateAndProcessLabel(lineInfo *line, int IC) /* Documentation in "assembler.h". */
+char *locateAndProcessLabel(lineInfo *line, int IC) 
 {
 	char *labelEnd = strchr(line->lineStr, ':');
 	labelInfo label = { 0 };
@@ -141,7 +141,7 @@ char *locateAndProcessLabel(lineInfo *line, int IC) /* Documentation in "assembl
 	return labelEnd + 1; /* +1 to make it point at the next char after the \0. */
 }
 
-void handleDataCommand(lineInfo *line, int *IC, int *DC) /* Documentation in "assembler.h". */
+void handleDataCommand(lineInfo *line, int *IC, int *DC) 
 {
 	char *operandTok = line->lineStr, *endOfOp = line->lineStr;
 	int operandValue;
@@ -186,13 +186,13 @@ void handleDataCommand(lineInfo *line, int *IC, int *DC) /* Documentation in "as
 
 	if (foundComma)
 	{
-		printError(line->lineNum, "ERROR: Commas found after the last parameter."); /* Comma after the last param. */
+		printError(line->lineNum, "ERROR: ',' cant be after the last parameter.");
 		line->isError = TRUE;
 		return;
 	}
 }
 
-void handleStringDirective(lineInfo *line, int *IC, int *DC) /* Documentation in "assembler.h". */
+void handleStringDirective(lineInfo *line, int *IC, int *DC) 
 {
 	char *str;
     if (line->label) /* Make the label a data label (if there is one). */
@@ -228,14 +228,14 @@ void handleStringDirective(lineInfo *line, int *IC, int *DC) /* Documentation in
     }
 }
 
-void handleExternalDirective(lineInfo *line) /* Documentation in "assembler.h". */
+void handleExternalDirective(lineInfo *line) 
 {
 	labelInfo label = { 0 }, *labelPointer;
 
 	if (line->label) /* If there is a label in the line, remove the it from labelArr. */
 	{
 		g_labelCount--;
-		printf("WARNING: At line %d: The assembler ignored the label before the directive.\n", line->lineNum);
+		printf("WARNING: At line %d: The assembler ignored the label before the directive.\n", (line->lineNum));
 	}
 
 	trimStr(&line->lineStr);
@@ -248,7 +248,18 @@ void handleExternalDirective(lineInfo *line) /* Documentation in "assembler.h". 
 	}
 }
 
-void handleEntryCommand(lineInfo *line) /* Documentation in "assembler.h". */
+char *duplicateString(const char *str) 
+{
+	char *newString = (char *)malloc(strlen(str) + 1);
+	if (newString) 
+	{
+		strcpy(newString, str); 
+	}
+
+	return newString;
+}
+
+void handleEntryCommand(lineInfo *line) 
 {
 	if (line->label) /* If there is a label in the line, remove the it from labelArr. */
 	{
@@ -273,7 +284,7 @@ void handleEntryCommand(lineInfo *line) /* Documentation in "assembler.h". */
 	}
 }
 
-void handleDirective(lineInfo *line, int *IC, int *DC) /* Documentation in "assembler.h". */
+void handleDirective(lineInfo *line, int *IC, int *DC) 
 {
 	int i = 0;
 	while (g_dircArr[i].name)
@@ -290,7 +301,7 @@ void handleDirective(lineInfo *line, int *IC, int *DC) /* Documentation in "asse
 	line->isError = TRUE;
 }
 
-boolean areLegalOpTypes(const command *cmd, operandInfo op1, operandInfo op2, int lineNum) /* Documentation in "assembler.h". */
+boolean areLegalOpTypes(const command *cmd, operandInfo op1, operandInfo op2, int lineNum) 
 {
 	/* Checks First Operand. */
 	if (cmd->opcode == 4 && op1.type != OP_LABEL) /* "lea" command (opcode is 4) can only get a label as the 1st op. */
@@ -308,13 +319,13 @@ boolean areLegalOpTypes(const command *cmd, operandInfo op1, operandInfo op2, in
 	return TRUE;
 }
 
-void parseOpInfo(operandInfo *operand, int lineNum) /* Documentation in "assembler.h". */
+void parseOpInfo(operandInfo *operand, int lineNum) 
 {
 	int value = 0;
 
 	if (isWhiteSpaces(operand->str))
 	{
-		printError(lineNum, "ERROR: Empty parameter.");
+		printError(lineNum, "ERROR: Incorrect parameter.");
 		operand->type = OP_INVALID;
 		return;
 	}
@@ -324,7 +335,7 @@ void parseOpInfo(operandInfo *operand, int lineNum) /* Documentation in "assembl
 		operand->str++; /* Remove the '#'. */
 		if (isspace(*operand->str)) /* Checks if the number is legal. */
 		{
-			printError(lineNum, "ERROR: There is a white space after the '#'.");
+			printError(lineNum, "ERROR: A space after the '#' exists.");
 			operand->type = OP_INVALID;
 		}
 		else
@@ -347,7 +358,7 @@ void parseOpInfo(operandInfo *operand, int lineNum) /* Documentation in "assembl
 	}
 	else /* The type is OP_INVALID. */
 	{
-		printError(lineNum, "ERROR: \"%s\" is an invalid parameter.", operand->str);
+		printError(lineNum, "ERROR: Invalid parameter- \"%s\".", operand->str);
 		operand->type = OP_INVALID;
 		value = -1;
 	}
@@ -355,7 +366,7 @@ void parseOpInfo(operandInfo *operand, int lineNum) /* Documentation in "assembl
 	operand->value = value;
 }
 	
-void parseCmdOperands(lineInfo *line, int *IC, int *DC) /* Documentation in "assembler.h". */
+void parseCmdOperands(lineInfo *line, int *IC, int *DC) 
 {
 	char *startOfNextPart = line->lineStr;
 	boolean foundComma = FALSE;
@@ -422,19 +433,19 @@ void parseCmdOperands(lineInfo *line, int *IC, int *DC) /* Documentation in "ass
 
 	if (foundComma) /* Check if there is a comma after the last param. */
 	{
-		printError(line->lineNum, "Don't write a comma after the last parameter.");
+		printError(line->lineNum, "Comma exists after the last parameter.");
 		line->isError = TRUE;
 		return;
 	}
 	
-	if (!areLegalOpTypes(line->cmd, line->op1, line->op2, line->lineNum)) /* Checsk if the operands types are legal. */
+	if (!areLegalOpTypes(line->cmd, line->op1, line->op2, line->lineNum))
 	{
 		line->isError = TRUE;
 		return;
 	}
 }
 
-void analyzeCommandArguments(lineInfo *line, int *IC, int *DC) /* Documentation in "assembler.h". */
+void analyzeCommandArguments(lineInfo *line, int *IC, int *DC) 
 {
 	int cmdId = getCmdId(line->commandStr);
 
@@ -443,11 +454,11 @@ void analyzeCommandArguments(lineInfo *line, int *IC, int *DC) /* Documentation 
 		line->cmd = NULL;
 		if (*line->commandStr == '\0')
 		{	
-			printError(line->lineNum, "ERROR: Can't write a label to an empty line.", line->commandStr); /* The command is empty, but the line isn't empty so it's only a label. */
+			printError(line->lineNum, "ERROR: Label to an empty line.", line->commandStr);
 		}
 		else
 		{
-			printError(line->lineNum, "ERROR: No such command as \"%s\".", line->commandStr); /* Illegal command. */
+			printError(line->lineNum, "ERROR: Command \"%s\" is not known.", line->commandStr); /* Illegal command. */
 		}
 		line->isError = TRUE;
 		return;
@@ -457,18 +468,7 @@ void analyzeCommandArguments(lineInfo *line, int *IC, int *DC) /* Documentation 
 	parseCmdOperands(line, IC, DC);
 }
 
-char *duplicateString(const char *str) 
-{
-	char *newString = (char *)malloc(strlen(str) + 1);
-	if (newString) 
-	{
-		strcpy(newString, str); 
-	}
-
-	return newString;
-}
-
-void analyzeAssemblyLine(lineInfo *line, char *lineStr, int lineNum, int *IC, int *DC) /* Documentation in "assembler.h". */
+void analyzeAssemblyLine(lineInfo *line, char *lineStr, int lineNum, int *IC, int *DC) 
 {
 	char *startOfNextPart = lineStr;
 
@@ -483,7 +483,7 @@ void analyzeAssemblyLine(lineInfo *line, char *lineStr, int lineNum, int *IC, in
 
 	if (!line->originalString)
 	{
-		printf("ERROR: Malloc failed, not enough memory.");
+		printf("ERROR: Memory allocation failed.");
 		return;
 	}
 	if (isCommentOrEmpty(line)) /* Check if the line is a comment. */
