@@ -20,9 +20,9 @@ const directive g_dircArr[] =
 	{ NULL } /* This value will represent the end of the array. */
 };	
 
-/* List of Commands */
-const command g_cmdArr[] =	
-{	/* Name | Opcode | NumOfParams */
+/* List of Commands form of Name, opcode, params */
+const command g_opArr[] =	
+{
 	{ "mov", 0, 2 } , 
 	{ "cmp", 1, 2 } ,
 	{ "add", 2, 2 } ,
@@ -39,10 +39,10 @@ const command g_cmdArr[] =
 	{ "jsr", 13, 1 } ,
 	{ "rts", 14, 0 } ,
 	{ "stop", 15, 0 } ,
-	{ NULL } /* This value will represent the end of the array. */
+	{ NULL }
 }; 
 
-labelInfo *addLabelToArr(labelInfo label, lineInfo *line) /* Documentation in "assembler.h". */
+labelInfo *insertLabelIfValid(labelInfo label, lineInfo *line) /* Documentation in "assembler.h". */
 {
 	if (!isLegalLabel(line->lineStr, line->lineNum, TRUE)) /* Check if the label is legal. */
 	{
@@ -68,7 +68,7 @@ labelInfo *addLabelToArr(labelInfo label, lineInfo *line) /* Documentation in "a
 	return NULL;
 }
 
-boolean addNumberToData(int num, int *IC, int *DC, int lineNum) /* Documentation in "assembler.h". */
+boolean insertValueIntoDataArray(int num, int *IC, int *DC, int lineNum) /* Documentation in "assembler.h". */
 {
 	if (*DC + *IC < RAM_LIMIT) /* Checks if there is enough space in g_arr for the data. */
 	{
@@ -85,7 +85,7 @@ boolean addStringToData(char *str, int *IC, int *DC, int lineNum) /* Documentati
 {
 	do
 	{
-		if (!addNumberToData((int)*str, IC, DC, lineNum))
+		if (!insertValueIntoDataArray((int)*str, IC, DC, lineNum))
 		{
 			return FALSE;
 		}
@@ -112,7 +112,7 @@ char *findLabel(lineInfo *line, int IC) /* Documentation in "assembler.h". */
 		return NULL;
 	}
 
-	line->label = addLabelToArr(label, line); /* Check of the label is legal and add it to the labelList. */
+	line->label = insertLabelIfValid(label, line); /* Check of the label is legal and add it to the labelList. */
 	return labelEnd + 1; /* +1 to make it point at the next char after the \0. */
 }
 
@@ -151,7 +151,7 @@ void parseDataDirc(lineInfo *line, int *IC, int *DC) /* Documentation in "assemb
 		
 		if (isLegalNum(operandTok, WORD_LENGTH - 3, line->lineNum, &operandValue)) /* Add the param to g_arr. */
 		{
-			if (!addNumberToData(operandValue, IC, DC, line->lineNum))
+			if (!insertValueIntoDataArray(operandValue, IC, DC, line->lineNum))
 			{
 				line->isError = TRUE; /* Not enough memory. */
 				return;
@@ -207,7 +207,7 @@ void parseExternDirc(lineInfo *line) /* Documentation in "assembler.h". */
 	}
 
 	trimStr(&line->lineStr);
-	labelPointer = addLabelToArr(label, line);
+	labelPointer = insertLabelIfValid(label, line);
 
 	if (!line->isError) /* Make the label an extern label. */
 	{
@@ -419,7 +419,7 @@ void parseCommand(lineInfo *line, int *IC, int *DC) /* Documentation in "assembl
 		return;
 	}
 
-	line->cmd = &g_cmdArr[cmdId];
+	line->cmd = &g_opArr[cmdId];
 	parseCmdOperands(line, IC, DC);
 }
 

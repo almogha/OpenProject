@@ -67,9 +67,9 @@ int getCmdId(char *cmdName)
 {
     int i = 0;
 
-    while (g_cmdArr[i].name)
+    while (g_opArr[i].name)
     {
-        if (strcmp(cmdName, g_cmdArr[i].name) == 0)
+        if (strcmp(cmdName, g_opArr[i].name) == 0)
         {
             return i; /* Return the command ID if found. */
         }

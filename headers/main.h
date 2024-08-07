@@ -95,7 +95,7 @@ typedef struct /* Line Structure */
 	boolean isError; /* Represent whether there is an error or not. */
 	labelInfo *label; /* A poniter to the lines label in labelArr. */
 	char *commandStr; /* The string of the command or directive. */
-	const command *cmd;	/* A pointer to the command in g_cmdArr. */
+	const command *cmd;	/* A pointer to the command in g_opArr. */
 	operandInfo op1; /* The 1st operand. */
 	operandInfo op2; /* The 2nd operand. */
 } lineInfo;
@@ -129,7 +129,7 @@ typedef struct /* Memory Word Structure - 15 bits */
  * This array holds information about the available commands in the assembler.
  * Each `command` structure typically includes the command's name, opcode, and the number of parameters it accepts.
  */
-extern const command g_cmdArr[];
+extern const command g_opArr[];
 
 /**
  * @brief Declares an external array of `labelInfo` structures.

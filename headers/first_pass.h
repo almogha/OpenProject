@@ -12,24 +12,24 @@
 #include "helpers.h"
 
 /**
- * @brief Adds a label to the label array if it is legal and doesn't already exist.
+ * @description This function attempts to insert a new label into an existing label array, provided the label meets the necessary criteria and is not a duplicate.
  *
- * @param label The label information to be added.
- * @param line The line information containing the label.
- * @return A pointer to the added label in the label array, or NULL if the label is illegal or already exists.
+ * @param label The label data intended for insertion.
+ * @param line The associated line data which includes the label.
+ * @return A pointer to the newly added label in the label array, or NULL if the label is invalid or already present.
  */
-labelInfo *addLabelToArr(labelInfo label, lineInfo *line);
+labelInfo *insertLabelIfValid(labelInfo label, lineInfo *line);
 
 /**
- * @brief Adds a number to the data array if there is enough space.
+ * @brief Inserts a value into the data array if space permits.
  *
- * @param num The number to be added.
+ * @param num The value to insert.
  * @param IC A pointer to the instruction counter.
  * @param DC A pointer to the data counter.
- * @param lineNum The line number (used for error reporting).
- * @return TRUE if the number was added successfully, FALSE if there is not enough space.
+ * @param lineNum The current line number used for error messages.
+ * @return TRUE if the value was successfully inserted, FALSE if there is insufficient space.
  */
-boolean addNumberToData(int num, int *IC, int *DC, int lineNum);
+boolean insertValueIntoDataArray(int num, int *IC, int *DC, int lineNum);
 
 /**
  * @brief Adds a string to the data array by converting each character to its ASCII value.
