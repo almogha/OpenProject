@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        errorsCount += firstPass(file, linesArr, &linesCount, &IC, &DC);
+        errorsCount += initialAssemblerPass(file, linesArr, &linesCount, &IC, &DC);
 
         printf("Starting second pass\n");
         errorsCount += secondPass(ramArr, linesArr, linesCount, IC, DC);

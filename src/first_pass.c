@@ -5,6 +5,81 @@
 #include "helpers.h"
 #include "first_pass.h"
 
+int initialAssemblerPass(FILE *file, lineInfo *linesArr, int *linesCount, int *IC, int *DC) /* Documentation in "assembler.h". */
+{
+	char lineStr[LINE_MAX_LENGTH + 2]; /* +2 for the \n and \0 at the end */
+	int errorsFound = 0;
+	*linesCount = 0;
+
+	
+	while (!feof(file)) /* Read lines and parse them. */
+	{
+		if (fetchLine(file, lineStr, LINE_MAX_LENGTH + 2)) 
+		{
+			if (*linesCount >= LINES_MAX_LENGTH) /* Checks if the file is too long. */
+			{
+				printf("ERROR: The file is too long. Max number of lines in a file is %d.\n", LINES_MAX_LENGTH);
+				return ++errorsFound;
+			}
+
+			analyzeAssemblyLine(&linesArr[*linesCount], lineStr, *linesCount + 1, IC, DC); /* Parse a line. */
+
+			if (linesArr[*linesCount].isError) /* Update errorsFound. */
+			{
+				errorsFound++;
+			}
+
+			if (*IC + *DC >= RAM_LIMIT) /* Check if the number of memory words needed is small enough. */
+			{
+				
+				printError(*linesCount + 1, "ERROR: The max memory words is %d, too much data and code.", RAM_LIMIT); /* dataArr is full. Stop reading the file. */
+				printf("Memory is full, file reading terminated.\n");
+				return ++errorsFound;
+			}
+			++*linesCount;
+		}
+		else if (!feof(file))
+		{
+			
+			printError(*linesCount + 1, "ERROR: The max line length is %d, line is too long.", LINE_MAX_LENGTH); /* Line is too long. */
+			errorsFound++;
+			 ++*linesCount;
+		}
+	}
+
+	return errorsFound;
+}
+
+boolean fetchLine(FILE *file, char *line_data, size_t maxLength) /* Documentation in "assembler.h". */
+{
+	char *endOfLine;
+
+	if (!fgets(line_data, maxLength, file))
+	{
+		return FALSE;
+	}
+	endOfLine = strchr(line_data, '\n'); /* Check if the line is too long (no '\n' was present). */
+
+	if (endOfLine)
+	{
+		*endOfLine = '\0';
+	}
+	else
+	{
+		char c;
+		boolean ret = (feof(file)) ? TRUE : FALSE; /* Return FALSE, unless it's the end of the file. */
+
+		do /* Keep reading chars until you reach the end of the line ('\n') or EOF. */
+		{
+			c = fgetc(file);
+		} while (c != '\n' && c != EOF);
+
+		return ret;
+	}
+
+	return TRUE;
+}
+
 labelInfo *insertLabelIfValid(labelInfo label, lineInfo *line) /* Documentation in "assembler.h". */
 {
 	if (!isLegalLabel(line->lineStr, line->lineNum, TRUE)) /* Check if the label is legal. */
@@ -152,7 +227,6 @@ void handleStringDirective(lineInfo *line, int *IC, int *DC) /* Documentation in
         return;
     }
 }
-
 
 void handleExternalDirective(lineInfo *line) /* Documentation in "assembler.h". */
 {
@@ -442,79 +516,4 @@ void analyzeAssemblyLine(lineInfo *line, char *lineStr, int lineNum, int *IC, in
 	{
 		return;
 	}
-}
-
-boolean readLine(FILE *file, char *line_data, size_t maxLength) /* Documentation in "assembler.h". */
-{
-	char *endOfLine;
-
-	if (!fgets(line_data, maxLength, file))
-	{
-		return FALSE;
-	}
-	endOfLine = strchr(line_data, '\n'); /* Check if the line is too long (no '\n' was present). */
-
-	if (endOfLine)
-	{
-		*endOfLine = '\0';
-	}
-	else
-	{
-		char c;
-		boolean ret = (feof(file)) ? TRUE : FALSE; /* Return FALSE, unless it's the end of the file. */
-
-		do /* Keep reading chars until you reach the end of the line ('\n') or EOF. */
-		{
-			c = fgetc(file);
-		} while (c != '\n' && c != EOF);
-
-		return ret;
-	}
-
-	return TRUE;
-}
-
-int firstPass(FILE *file, lineInfo *linesArr, int *linesCount, int *IC, int *DC) /* Documentation in "assembler.h". */
-{
-	char lineStr[LINE_MAX_LENGTH + 2]; /* +2 for the \n and \0 at the end */
-	int errorsFound = 0;
-	*linesCount = 0;
-
-	
-	while (!feof(file)) /* Read lines and parse them. */
-	{
-		if (readLine(file, lineStr, LINE_MAX_LENGTH + 2)) 
-		{
-			if (*linesCount >= LINES_MAX_LENGTH) /* Checks if the file is too long. */
-			{
-				printf("ERROR: The file is too long. Max number of lines in a file is %d.\n", LINES_MAX_LENGTH);
-				return ++errorsFound;
-			}
-
-			analyzeAssemblyLine(&linesArr[*linesCount], lineStr, *linesCount + 1, IC, DC); /* Parse a line. */
-
-			if (linesArr[*linesCount].isError) /* Update errorsFound. */
-			{
-				errorsFound++;
-			}
-
-			if (*IC + *DC >= RAM_LIMIT) /* Check if the number of memory words needed is small enough. */
-			{
-				
-				printError(*linesCount + 1, "ERROR: The max memory words is %d, too much data and code.", RAM_LIMIT); /* dataArr is full. Stop reading the file. */
-				printf("Memory is full, file reading terminated.\n");
-				return ++errorsFound;
-			}
-			++*linesCount;
-		}
-		else if (!feof(file))
-		{
-			
-			printError(*linesCount + 1, "ERROR: The max line length is %d, line is too long.", LINE_MAX_LENGTH); /* Line is too long. */
-			errorsFound++;
-			 ++*linesCount;
-		}
-	}
-
-	return errorsFound;
 }
