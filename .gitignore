@@ -1,0 +1,27 @@
+# Object files
+obj/
+
+# Executable files
+assembler
+
+# Dependency files
+*.d
+
+# Backup files
+*~ 
+*.bak
+
+# IDE and editor files
+.vscode/
+*.swp
+*.swo
+*.swn
+
+# Log files
+*.log
+
+# MacOS-specific files
+.DS_Store
+
+# Linux-specific files
+*.out
