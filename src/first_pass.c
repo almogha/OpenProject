@@ -81,19 +81,6 @@ boolean insertValueIntoDataArray(int num, int *IC, int *DC, int lineNum) /* Docu
 	return TRUE;
 }
 
-boolean addStringToData(char *str, int *IC, int *DC, int lineNum) /* Documentation in "assembler.h". */
-{
-	do
-	{
-		if (!insertValueIntoDataArray((int)*str, IC, DC, lineNum))
-		{
-			return FALSE;
-		}
-	} while (*str++);
-
-	return TRUE;
-}
-
 char *findLabel(lineInfo *line, int IC) /* Documentation in "assembler.h". */
 {
 	char *labelEnd = strchr(line->lineStr, ':');
@@ -175,27 +162,40 @@ void parseDataDirc(lineInfo *line, int *IC, int *DC) /* Documentation in "assemb
 
 void parseStringDirc(lineInfo *line, int *IC, int *DC) /* Documentation in "assembler.h". */
 {
-	if (line->label) /* Make the label a data label (if there is one). */
-	{
-		line->label->isData = TRUE;
-		line->label->address = INITIAL_ADDRESS + *DC;
-	}
-	trimStr(&line->lineStr);
+	char *str;
+    if (line->label) /* Make the label a data label (if there is one). */
+    {
+        line->label->isData = TRUE;
+        line->label->address = INITIAL_ADDRESS + *DC;
+    }
+    trimStr(&line->lineStr);
 
-	if (isLegalStringParam(&line->lineStr, line->lineNum))
-	{
-		if (!addStringToData(line->lineStr, IC, DC, line->lineNum))
-		{
-			line->isError = TRUE; /* Not enough memory. */
-			return;
-		}
-	}
-	else
-	{
-		line->isError = TRUE; /* Illegal string. */
-		return;
-	}
+    if (isLegalStringParam(&line->lineStr, line->lineNum))
+    {
+		str = line->lineStr;
+        while (*str)
+        {
+            if (!insertValueIntoDataArray((int)*str, IC, DC, line->lineNum))
+            {
+                line->isError = TRUE; /* Not enough memory. */
+                return;
+            }
+            str++;
+        }
+		/* Ensure the string is null-terminated in the data array */
+        if (!insertValueIntoDataArray(0, IC, DC, line->lineNum))
+        {
+            line->isError = TRUE; /* Not enough memory. */
+            return;
+        }
+    }
+    else
+    {
+        line->isError = TRUE; /* Illegal string. */
+        return;
+    }
 }
+
 
 void parseExternDirc(lineInfo *line) /* Documentation in "assembler.h". */
 {

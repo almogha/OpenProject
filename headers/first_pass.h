@@ -32,17 +32,6 @@ labelInfo *insertLabelIfValid(labelInfo label, lineInfo *line);
 boolean insertValueIntoDataArray(int num, int *IC, int *DC, int lineNum);
 
 /**
- * @brief Adds a string to the data array by converting each character to its ASCII value.
- *
- * @param str The string to be added.
- * @param IC A pointer to the instruction counter.
- * @param DC A pointer to the data counter.
- * @param lineNum The line number (used for error reporting).
- * @return TRUE if the string was added successfully, FALSE if there is not enough space.
- */
-boolean addStringToData(char *str, int *IC, int *DC, int lineNum);
-
-/**
  * @brief Finds and processes a label in a line of assembly code.
  *
  * @param line The line information containing the potential label.
