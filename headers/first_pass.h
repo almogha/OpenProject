@@ -24,8 +24,8 @@ labelInfo *insertLabelIfValid(labelInfo label, lineInfo *line);
  * @brief Inserts a value into the data array if space permits.
  *
  * @param num The value to insert.
- * @param IC A pointer to the instruction counter.
- * @param DC A pointer to the data counter.
+ * @param IC Pointer to the instructions counter.
+ * @param DC Pointer to the data counter.
  * @param lineNum The current line number used for error messages.
  * @return TRUE if the value was successfully inserted, FALSE if there is insufficient space.
  */
@@ -41,43 +41,45 @@ boolean insertValueIntoDataArray(int num, int *IC, int *DC, int lineNum);
 char *locateAndProcessLabel(lineInfo *line, int IC);
 
 /**
- * @brief Parses a .data directive and adds its values to the data array.
+ * @brief Processes .data incorporates its values into the data list.
  *
- * @param line The line information containing the .data directive.
- * @param IC A pointer to the instruction counter.
- * @param DC A pointer to the data counter.
+ * @param line The structure containing the details of the .data command.
+ * @param IC Pointer to the instructions counter.
+ * @param DC Pointer to the data counter.
  */
-void parseDataDirc(lineInfo *line, int *IC, int *DC);
+void handleDataCommand(lineInfo *line, int *IC, int *DC);
+
 
 /**
- * @brief Parses a .string directive and adds its values to the data array.
+ * @brief Processes .string directive and appends its content to the data buffer.
  *
- * @param line The line information containing the .string directive.
- * @param IC A pointer to the instruction counter.
- * @param DC A pointer to the data counter.
+ * @param line A structure holding the details of the .string directive.
+ * @param IC Pointer to the instructions counter.
+ * @param DC Pointer to the data counter.
  */
-void parseStringDirc(lineInfo *line, int *IC, int *DC);
+
+void handleStringDirective(lineInfo *line, int *IC, int *DC);
 
 /**
- * @brief Parses an .extern directive and adds the label as an external label.
- * @param line The line information containing the .extern directive.
+ * @brief Analyzes a .extern directive and registers the label as an external reference.
+ * @param lineDetails The line data that includes the .extern directive.
  */
-void parseExternDirc(lineInfo *line);
+void handleExternalDirective(lineInfo *line);
 
 /**
- * @brief Parses an .entry directive and adds the label to the entry labels list.
- * @param line The line information containing the .entry directive.
+ * @brief Processes an .entry command and appends the associated label to the list of entry labels.
+ * @param line Contains the details of the line with the .entry.
  */
-void parseEntryDirc(lineInfo *line);
+void handleEntryCommand(lineInfo *line);
 
 /**
- * @brief Parses a directive and calls the appropriate parsing function.
+ * @brief Processes a given directive and invokes the corresponding handler function.
  *
- * @param line The line information containing the directive.
- * @param IC A pointer to the instruction counter.
- * @param DC A pointer to the data counter.
+ * @param line The line that contains the directive.
+ * @param IC Pointer to the instructions counter.
+ * @param DC Pointer to the data counter.
  */
-void parseDirective(lineInfo *line, int *IC, int *DC);
+void handleDirective(lineInfo *line, int *IC, int *DC);
 
 /**
  * @brief Parses and validates operand information.
@@ -93,44 +95,44 @@ void parseOpInfo(operandInfo *operand, int lineNum);
  * This function parses and validates the operands for a given command. It checks if the operands
  * are legal and updates the instruction counter (IC) accordingly.
  * @param line The line information containing the command and operands.
- * @param IC A pointer to the instruction counter.
- * @param DC A pointer to the data counter.
+ * @param IC Pointer to the instructions counter.
+ * @param DC Pointer to the data counter.
  */
 void parseCmdOperands(lineInfo *line, int *IC, int *DC);
 
-/**
- * @brief Parses a command and its operands.
+ /**
+ * @brief Analyzes and verifies command arguments.
  *
- * This function identifies and parses a command in a line, extracts and validates its operands,
- * and updates the instruction counter (IC) accordingly.
- * @param line The line information containing the command and operands.
- * @param IC A pointer to the instruction counter.
- * @param DC A pointer to the data counter.
+ * This function analyzes and verifies the arguments associated with a command. It ensures that the
+ * arguments are valid and adjusts the instruction counter (IC) as needed.
+ * @param line The information line that includes the command and its arguments.
+ * @param IC Pointer to the instructions counter.
+ * @param DC Pointer to the data counter.
  */
-void parseCommand(lineInfo *line, int *IC, int *DC);
+void analyzeCommandArguments(lineInfo *line, int *IC, int *DC);
 
 /**
- * @brief Allocates memory for a string and copies its content.
+ * @brief Creates a duplicate of the given string by allocating new memory.
  *
- * This function allocates memory for a new string and copies the content of the input string
- * to the newly allocated memory.
- * @param str The input string to be copied.
- * @return A pointer to the newly allocated and copied string.
+ * This function reserves memory for a copy of the input string and transfers its content
+ * into the newly allocated memory space.
+ * @param str The string to be duplicated.
+ * @return A pointer to the newly allocated memory containing the copied string.
  */
-char *allocString(const char *str);
+char *duplicateString(const char *str);
 
 /**
- * @brief Parses a line of assembly code.
+ * @brief Analyzes and processes a single line of assembly input.
  *
- * This function parses a line of assembly code, identifies labels, directives, and commands,
- * and updates the instruction counter (IC) and data counter (DC) accordingly.
- * @param line The line information structure to be filled.
- * @param lineStr The input line string to be parsed.
- * @param lineNum The line number (used for error reporting).
- * @param IC A pointer to the instruction counter.
- * @param DC A pointer to the data counter.
+ * This function analyzes a given line of assembly code, distinguishing between labels, directives, and operations,
+ * and adjusts the instruction counter (IC) and data counter (DC) based on the analysis.
+ * @param line The line information structure.
+ * @param lineStr The input line string.
+ * @param lineNum The line number.
+ * @param IC Pointer to the instructions counter.
+ * @param DC Pointer to the data counter.
  */
-void parseLine(lineInfo *line, char *lineStr, int lineNum, int *IC, int *DC);
+void analyzeAssemblyLine(lineInfo *line, char *lineStr, int lineNum, int *IC, int *DC);
 
 /**
  * @brief Reads a line from a file.
@@ -152,8 +154,8 @@ boolean readLine(FILE *file, char *line_data, size_t maxLength);
  * @param file The file pointer to the source file.
  * @param linesArr The array to store parsed line information.
  * @param linesFound A pointer to the number of lines found.
- * @param IC A pointer to the instruction counter.
- * @param DC A pointer to the data counter.
+ * @param IC Pointer to the instructions counter.
+ * @param DC Pointer to the data counter.
  * @return Returns the number of errors found during the first pass.
  */
 int firstPass(FILE *file, lineInfo *linesArr, int *linesFound, int *IC, int *DC);

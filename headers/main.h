@@ -91,7 +91,7 @@ typedef struct /* Line Structure */
 	int lineNum; /* The number of the line in the file. */
 	int address; /* The address of the first word in the line. */
 	char *originalString; /* The original pointer, allocated by malloc. */
-	char *lineStr; /* The text it contains (changed while using parseLine). */
+	char *lineStr; /* The text it contains (changed while using analyzeAssemblyLine). */
 	boolean isError; /* Represent whether there is an error or not. */
 	labelInfo *label; /* A poniter to the lines label in labelArr. */
 	char *commandStr; /* The string of the command or directive. */

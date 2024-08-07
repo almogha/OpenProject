@@ -846,8 +846,8 @@ char *removeExtraSpacesFile(char file_name[])
     if (source_pointer_temp == NULL)
     {
         fclose(source_pointer);
-        free(new_file_name);
         printf("ERROR: Failed to open the temporary file \"%s\" for writing.\n", new_file_name);
+        free(new_file_name);
         return NULL;
     }
 

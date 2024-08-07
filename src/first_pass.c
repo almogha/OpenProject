@@ -66,7 +66,7 @@ char *locateAndProcessLabel(lineInfo *line, int IC) /* Documentation in "assembl
 	return labelEnd + 1; /* +1 to make it point at the next char after the \0. */
 }
 
-void parseDataDirc(lineInfo *line, int *IC, int *DC) /* Documentation in "assembler.h". */
+void handleDataCommand(lineInfo *line, int *IC, int *DC) /* Documentation in "assembler.h". */
 {
 	char *operandTok = line->lineStr, *endOfOp = line->lineStr;
 	int operandValue;
@@ -117,7 +117,7 @@ void parseDataDirc(lineInfo *line, int *IC, int *DC) /* Documentation in "assemb
 	}
 }
 
-void parseStringDirc(lineInfo *line, int *IC, int *DC) /* Documentation in "assembler.h". */
+void handleStringDirective(lineInfo *line, int *IC, int *DC) /* Documentation in "assembler.h". */
 {
 	char *str;
     if (line->label) /* Make the label a data label (if there is one). */
@@ -154,7 +154,7 @@ void parseStringDirc(lineInfo *line, int *IC, int *DC) /* Documentation in "asse
 }
 
 
-void parseExternDirc(lineInfo *line) /* Documentation in "assembler.h". */
+void handleExternalDirective(lineInfo *line) /* Documentation in "assembler.h". */
 {
 	labelInfo label = { 0 }, *labelPointer;
 
@@ -174,7 +174,7 @@ void parseExternDirc(lineInfo *line) /* Documentation in "assembler.h". */
 	}
 }
 
-void parseEntryDirc(lineInfo *line) /* Documentation in "assembler.h". */
+void handleEntryCommand(lineInfo *line) /* Documentation in "assembler.h". */
 {
 	if (line->label) /* If there is a label in the line, remove the it from labelArr. */
 	{
@@ -199,7 +199,7 @@ void parseEntryDirc(lineInfo *line) /* Documentation in "assembler.h". */
 	}
 }
 
-void parseDirective(lineInfo *line, int *IC, int *DC) /* Documentation in "assembler.h". */
+void handleDirective(lineInfo *line, int *IC, int *DC) /* Documentation in "assembler.h". */
 {
 	int i = 0;
 	while (g_dircArr[i].name)
@@ -360,7 +360,7 @@ void parseCmdOperands(lineInfo *line, int *IC, int *DC) /* Documentation in "ass
 	}
 }
 
-void parseCommand(lineInfo *line, int *IC, int *DC) /* Documentation in "assembler.h". */
+void analyzeCommandArguments(lineInfo *line, int *IC, int *DC) /* Documentation in "assembler.h". */
 {
 	int cmdId = getCmdId(line->commandStr);
 
@@ -383,7 +383,7 @@ void parseCommand(lineInfo *line, int *IC, int *DC) /* Documentation in "assembl
 	parseCmdOperands(line, IC, DC);
 }
 
-char *allocString(const char *str) 
+char *duplicateString(const char *str) 
 {
 	char *newString = (char *)malloc(strlen(str) + 1);
 	if (newString) 
@@ -394,13 +394,13 @@ char *allocString(const char *str)
 	return newString;
 }
 
-void parseLine(lineInfo *line, char *lineStr, int lineNum, int *IC, int *DC) /* Documentation in "assembler.h". */
+void analyzeAssemblyLine(lineInfo *line, char *lineStr, int lineNum, int *IC, int *DC) /* Documentation in "assembler.h". */
 {
 	char *startOfNextPart = lineStr;
 
 	line->lineNum = lineNum;
 	line->address = INITIAL_ADDRESS + *IC;
-	line->originalString = allocString(lineStr);
+	line->originalString = duplicateString(lineStr);
 	line->lineStr = line->originalString;
 	line->isError = FALSE;
 	line->label = NULL;
@@ -432,11 +432,11 @@ void parseLine(lineInfo *line, char *lineStr, int lineNum, int *IC, int *DC) /* 
 	if (isDirective(line->commandStr)) /* Parse the command / directive. */
 	{
 		line->commandStr++; /* Remove the '.' from the command. */
-		parseDirective(line, IC, DC);
+		handleDirective(line, IC, DC);
 	}
 	else
 	{
-		parseCommand(line, IC, DC);
+		analyzeCommandArguments(line, IC, DC);
 	}
 	if (line->isError)
 	{
@@ -491,7 +491,7 @@ int firstPass(FILE *file, lineInfo *linesArr, int *linesCount, int *IC, int *DC)
 				return ++errorsFound;
 			}
 
-			parseLine(&linesArr[*linesCount], lineStr, *linesCount + 1, IC, DC); /* Parse a line. */
+			analyzeAssemblyLine(&linesArr[*linesCount], lineStr, *linesCount + 1, IC, DC); /* Parse a line. */
 
 			if (linesArr[*linesCount].isError) /* Update errorsFound. */
 			{

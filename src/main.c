@@ -16,10 +16,10 @@ labelInfo g_labelsArr[LABELS_MAX];     /* Array of labelInfo structures to store
 
 const directive g_dircArr[] = 
 {
-	{ "data", parseDataDirc } ,
-	{ "string", parseStringDirc } ,
-	{ "extern", parseExternDirc },
-	{ "entry", parseEntryDirc },
+	{ "data", handleDataCommand } ,
+	{ "string", handleStringDirective } ,
+	{ "extern", handleExternalDirective },
+	{ "entry", handleEntryCommand },
 	{ NULL }
 };	
 
