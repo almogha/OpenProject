@@ -32,31 +32,13 @@ labelInfo *insertLabelIfValid(labelInfo label, lineInfo *line);
 boolean insertValueIntoDataArray(int num, int *IC, int *DC, int lineNum);
 
 /**
- * @brief Adds a string to the data array by converting each character to its ASCII value.
+ * @brief Searches for and handles a label within a given assembly code line.
  *
- * @param str The string to be added.
- * @param IC A pointer to the instruction counter.
- * @param DC A pointer to the data counter.
- * @param lineNum The line number (used for error reporting).
- * @return TRUE if the string was added successfully, FALSE if there is not enough space.
+ * @param line The structure holding details about the line, which may include a label.
+ * @param IC The current value of the instruction counter.
+ * @return A pointer to the character immediately following the label in the line, or NULL if a label is not present.
  */
-boolean addStringToData(char *str, int *IC, int *DC, int lineNum);
-
-/**
- * @brief Finds and processes a label in a line of assembly code.
- *
- * @param line The line information containing the potential label.
- * @param IC The instruction counter.
- * @return A pointer to the next character after the label in the line, or NULL if no label is found.
- */
-char *findLabel(lineInfo *line, int IC);
-
-/**
- * @brief Removes the last added label from the label array and prints a warning.
- *
- * @param lineNum The line number where the label was found (used for warning message).
- */
-void removeLastLabel(int lineNum);
+char *locateAndProcessLabel(lineInfo *line, int IC);
 
 /**
  * @brief Parses a .data directive and adds its values to the data array.
