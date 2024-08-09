@@ -30,7 +30,7 @@
 
 
 # Compiler and flags
-CFLAGS = -Wall -ansi -pedantic -Iheaders
+CFLAGS = -Wall -ansi -pedantic -Wno-strict-prototypes -Iheaders
 
 # Directories
 SRC_DIR = src

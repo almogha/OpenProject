@@ -18,7 +18,7 @@ void updateDataLabelsAddress(int IC)
 	}
 }
 
-int countIllegalEntries()
+int countIllegalEntries(void)
 {
 	int i, ret = 0;
 	labelInfo *label;

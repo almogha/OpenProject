@@ -29,7 +29,7 @@ void updateDataLabelsAddress(int IC);
  * The function returns the total number of errors found.
  * @return The total number of errors found in the entry labels.
  */
-int countIllegalEntries();
+int countIllegalEntries(void);
 
 /**
  * @brief Updates the address of a label operand.
