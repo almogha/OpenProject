@@ -23,117 +23,120 @@
  */
 void adjustDataLabelAddresses(int IC);
 
-/**
- * @brief Counts the number of illegal entry labels and reports errors.
+ /**
+ * @brief Validates entry labels in the global entry lines array.
  *
- * This function iterates through the global entry lines array and checks each entry label.
- * It reports errors if an entry label is found to be an external label or if the label does not exist.
- * The function returns the total number of errors found.
- * @return The total number of errors found in the entry labels.
+ * This function iterates over the global array of entry lines (`g_entryLinesArr`)
+ * and checks if the associated labels are valid. It counts labels that are either 
+ * external or non-existent. 
+ * Any issues encountered are reported, and the total number of illegal entry labels is returned.
+ *
+ * @return int The number of illegal entry labels found.
  */
-int countIllegalEntries(void);
+int validateEntryLabels(void);
+
+ /**
+ * @brief Updates the operand's value with the address of the associated label, if applicable.
+ *
+ * This function checks if the provided operand is of type `OP_LABEL`. If it is, the function 
+ * attempts to retrieve the label's address and update the operand's value with it. If the 
+ * label does not exist, an error is logged, and the function returns `FALSE`. Otherwise, the 
+ * function returns `TRUE` after successfully updating the operand's value.
+ * @param op A pointer to the operand information structure (`operandInfo`) containing details about the operand.
+ * @param lineNum The line number in the source code where this function is being called, used for error reporting.
+ * @return `TRUE` if the operand value is successfully updated or is not of type `OP_LABEL` `FALSE` if the label does not exist.
+ */
+boolean updateOperandLabelAddress(operandInfo *op, int lineNum);
+
+ /**
+ * @brief Extracts the numeric value from a memory word.
+ *
+ * This function applies a mask to a given memory word, shifts its bits,
+ * and returns the processed numeric value.
+ * @param memory A memoryWord struct containing the value bits and the 'are' field.
+ * @return The processed numeric value from the memory word.
+ */
+int extractValueFromMemoryWord(memoryWord memory);
 
 /**
- * @brief Updates the address of a label operand.
+ * Retrieves the ID of the operand type.
  *
- * This function checks if the operand is of type OP_LABEL. If so, it retrieves the label information
- * and updates the operand's value with the label's address. If the label does not exist, an error is reported.
- * @param op A pointer to the operand information to be updated.
- * @param lineNum The line number where the operand is located (used for error reporting).
- * @return Returns TRUE if the label exists and the address was updated, otherwise FALSE.
+ * @param op The operand information structure.
+ * @return The operand type ID if valid; otherwise, returns 0.
  */
-boolean updateLabelOpAddress(operandInfo *op, int lineNum);
+int retrieveOperandTypeId(operandInfo op);
 
 /**
- * @brief Extracts the numerical value from a memory word.
- *
- * This function applies a bitmask to the value in a memory word to extract the relevant bits.
- * It combines the value bits and the ARE (Addressing, Relocatable, External) bits into a single integer.
- * @param memory The memory word to extract the value from.
- * @return The extracted numerical value from the memory word.
- */
-int getNumFromMemoryWord(memoryWord memory);
-
-/**
- * @brief Retrieves the type ID of an operand.
- *
- * This function checks if the operand type is valid and returns its type ID.
- * If the operand type is invalid, it returns 0.
- * @param op The operand information.
- * @return The type ID of the operand if valid, otherwise 0.
- */
-int getOpTypeId(operandInfo op);
-
-/**
- * @brief Creates a memory word for a command line.
- *
- * This function creates and initializes a memory word for a given command line.
- * It sets the ARE type to ARE_ABS and encodes the destination and source operand types and the opcode.
- *
- * @param line The line information containing the command and operands.
- * @return The created memory word for the command.
- */
-memoryWord getCmdMemoryWord(lineInfo line);
-
-/**
- * @brief Creates a memory word for an operand.
- *
- * This function creates and initializes a memory word for a given operand.
- * It sets the ARE type and encodes the operand value based on its type (register, indirect register, label, or number).
- *
- * @param op The operand information.
- * @param isDest A flag indicating if the operand is a destination operand.
- * @return The created memory word for the operand.
- */
-memoryWord getOpMemoryWord(operandInfo op, boolean isDest);
-
-/**
- * @brief Adds a memory word to the memory array.
- *
- * This function adds a memory word to the memory array at the current memory counter position.
- * It increments the memory counter after adding the word.
- *
- * @param memoryArr The memory array to add the word to.
- * @param memoryCounter A pointer to the current memory counter.
- * @param memory The memory word to add.
- */
-void addWordToMemory(int *memoryArr, int *memoryCounter, memoryWord memory);
-
-/**
- * @brief Adds a line to the memory array, updating operand addresses as needed.
- *
- * This function adds the memory words for a line to the memory array, updating the addresses of label operands.
- * It handles different operand types (register, indirect register, label, number) and adds the appropriate memory words.
- * @param memoryArr The memory array to add the line to.
- * @param memoryCounter A pointer to the current memory counter.
- * @param line A pointer to the line information.
- * @return Returns TRUE if no error was found, otherwise FALSE.
- */
-boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line);
-
-/**
- * @brief Adds data to the memory array.
- *
- * This function adds data words to the memory array, applying a bitmask to each data word.
- * It increments the memory counter for each data word added.
- * @param memoryArr The memory array to add the data to.
- * @param memoryCounter A pointer to the current memory counter.
- * @param DC The data counter indicating the number of data words.
- */
-void addDataToMemory(int *memoryArr, int *memoryCounter, int DC);
-
-/**
- * @brief Performs the second pass of reading and processing an assembly language file.
+ * @brief Constructs a memoryWord representing the command and operand types from the given line information.
  * 
- * This function updates the addresses of data labels, checks for illegal entries,
- * and adds the parsed lines and data to the memory array. It returns the total
- * number of errors encountered during this process.
- * @param memoryArr An array of integers representing the memory of the assembly program.
- * @param linesArr An array of lineInfo structures holding information about each parsed line.
- * @param lineNum The number of lines in the linesArr array.
+ * This function initializes a memoryWord with the appropriate command bits, 
+ * setting the destination operand type, source operand type, and opcode based on the provided line information.
+ * @param line The line information containing the command and operand details.
+ * @return A memoryWord struct populated with the command bits.
+ */
+memoryWord constructCmdMemoryWord(lineInfo line);
+
+/**
+ * Converts an operand into a memory word structure based on the operand type and destination status.
+ *
+ * @param op The operand information including its type and value.
+ * @param isDest Indicates if the operand is a destination (true) or source (false).
+ * @return A memoryWord structure populated based on the operand type and value.
+ */
+memoryWord convertOperandToMemoryWord(operandInfo op, boolean isDest);
+
+/**
+ * @brief Adds a word to the memory array if there is available space.
+ *
+ * This function inserts a memory word into the specified memory array, provided
+ * that there is still room in the array (i.e., the counter is below the RAM limit).
+ * The counter is incremented after adding the word.
+ * @param memoryArr Pointer to the array where the memory word will be added.
+ * @param memoryCounter Pointer to the counter tracking the current number of elements in the memory array.
+ * @param memory The memory word to be added.
+ */
+void insertWordIntoMemory(int *memoryArr, int *memoryCounter, memoryWord memory);
+
+ /**
+ * @brief Processes a line of code and updates memory accordingly.
+ *
+ * This function checks if the provided line of code is valid and processes it by updating operand label addresses, 
+ * adding the command and operand memory words to memory, and handling different operand types.
+ * It also marks the line as erroneous if label updates fail.
+ * @param memoryArr Pointer to the array of memory words.
+ * @param memoryCounter Pointer to the memory counter.
+ * @param line Pointer to the lineInfo structure containing the line of code to be processed.
+ *
+ * @return boolean TRUE if the line was processed without errors, FALSE otherwise.
+ */
+boolean processLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line);
+
+/**
+ * @brief Adds data to a memory array with a mask applied.
+ *
+ * This function takes data from a global array and adds it to the provided
+ * memory array until the memory counter reaches a limit or all data is processed.
+ * A mask is applied to each data item before adding it to the memory array.
+ * @param memoryArr Pointer to the memory array where data will be added.
+ * @param memoryCounter Pointer to the counter tracking the current position in the memory array.
+ * @param DC The data counter value at the end of the first pass.
+ */
+void insertDataWithMask(int *memoryArr, int *memoryCounter, int DC);
+
+ /**
+ * @brief Processes lines of code, adjusts label addresses, and updates memory with data (Second pass).
+ *
+ * This function performs the following tasks:
+ * 1. Updates data label addresses based on the current instruction counter (IC).
+ * 2. Validates entry labels and counts illegal entries.
+ * 3. Processes each line and adds it to memory.
+ * 4. Inserts data into memory with appropriate masking.
+ * @param memoryArr Pointer to the array representing memory.
+ * @param linesArr Pointer to the array of line information.
+ * @param lineNum The number of lines to process.
  * @param IC The instruction counter value at the end of the first pass.
  * @param DC The data counter value at the end of the first pass.
- * @return The total number of errors encountered during the second pass.
+ * @return The total number of errors found during processing.
  */
 int secondPass(int *memoryArr, lineInfo *linesArr, int lineNum, int IC, int DC);
 

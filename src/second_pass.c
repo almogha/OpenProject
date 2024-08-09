@@ -18,7 +18,7 @@ void adjustDataLabelAddresses(int IC)
 	}
 }
 
-int countIllegalEntries(void)
+int validateEntryLabels(void)
 {
 	int i, ret = 0;
 	labelInfo *label;
@@ -44,7 +44,7 @@ int countIllegalEntries(void)
 	return ret;
 }
 
-boolean updateLabelOpAddress(operandInfo *op, int lineNum)
+boolean updateOperandLabelAddress(operandInfo *op, int lineNum)
 {
 	if (op->type == OP_LABEL)
 	{
@@ -63,7 +63,7 @@ boolean updateLabelOpAddress(operandInfo *op, int lineNum)
 	return TRUE;
 }
 
-int getNumFromMemoryWord(memoryWord memory)
+int extractValueFromMemoryWord(memoryWord memory)
 {
 	unsigned int mask = ~0;
 	mask >>= (sizeof(int) * BYTE_LENGTH - WORD_LENGTH);
@@ -71,7 +71,7 @@ int getNumFromMemoryWord(memoryWord memory)
 	return mask & ((memory.valueBits.value << 3) + memory.are); /* Return the memory word value with the mask applied. */
 }
 
-int getOpTypeId(operandInfo op)
+int retrieveOperandTypeId(operandInfo op)
 {
 	if (op.type != OP_INVALID)
 	{
@@ -81,19 +81,19 @@ int getOpTypeId(operandInfo op)
 	return 0; /* Return 0 for invalid operand type. */
 }
 
-memoryWord getCmdMemoryWord(lineInfo line)
+memoryWord constructCmdMemoryWord(lineInfo line)
 {
 	memoryWord memory = { 0 };
 
 	memory.are = (AREKind)ARE_ABS;
-	memory.valueBits.cmdBits.dest = getOpTypeId(line.op2); /* Set the destination operand type. */
-	memory.valueBits.cmdBits.src = getOpTypeId(line.op1); /* Set the source operand type. */
+	memory.valueBits.cmdBits.dest = retrieveOperandTypeId(line.op2); /* Set the destination operand type. */
+	memory.valueBits.cmdBits.src = retrieveOperandTypeId(line.op1); /* Set the source operand type. */
 	memory.valueBits.cmdBits.opcode = line.cmd->opcode; /* Set the opcode. */
 
 	return memory;
 }
 
-memoryWord getOpMemoryWord(operandInfo op, boolean isDest)
+memoryWord convertOperandToMemoryWord(operandInfo op, boolean isDest)
 {
 	memoryWord memory = { 0 };
 
@@ -142,27 +142,27 @@ memoryWord getOpMemoryWord(operandInfo op, boolean isDest)
 	return memory;
 }
 
-void addWordToMemory(int *memoryArr, int *memoryCounter, memoryWord memory)
+void insertWordIntoMemory(int *memoryArr, int *memoryCounter, memoryWord memory)
 {
 	if (*memoryCounter < RAM_LIMIT)
 	{
-		memoryArr[(*memoryCounter)++] = getNumFromMemoryWord(memory); /* Add the memory word to the memory array. */
+		memoryArr[(*memoryCounter)++] = extractValueFromMemoryWord(memory); /* Add the memory word to the memory array. */
 	}
 }
 
-boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
+boolean processLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 {
 	boolean foundError = FALSE;
 
 	if (!line->isError && line->cmd != NULL)
 	{
-		if (!updateLabelOpAddress(&line->op1, line->lineNum) || !updateLabelOpAddress(&line->op2, line->lineNum))
+		if (!updateOperandLabelAddress(&line->op1, line->lineNum) || !updateOperandLabelAddress(&line->op2, line->lineNum))
 		{
 			line->isError = TRUE;
 			foundError = TRUE; /* Mark the line as an error if label update fails. */
 		}
 
-		addWordToMemory(memoryArr, memoryCounter, getCmdMemoryWord(*line)); /* Add the command memory word to memory. */
+		insertWordIntoMemory(memoryArr, memoryCounter, constructCmdMemoryWord(*line)); /* Add the command memory word to memory. */
 
 		if (line->op1.type == OP_REGULAR_REG && line->op2.type == OP_REGULAR_REG)
 		{
@@ -171,7 +171,7 @@ boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 			memory.valueBits.regBits.destBits = line->op2.value;
 			memory.valueBits.regBits.srcBits = line->op1.value;
 
-			addWordToMemory(memoryArr, memoryCounter, memory); /* Add register operand memory word. */
+			insertWordIntoMemory(memoryArr, memoryCounter, memory); /* Add register operand memory word. */
 		}
 		else if (line->op1.type == OP_REGULAR_REG && line->op2.type == OP_INDIRECT_REG)
 		{
@@ -180,7 +180,7 @@ boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 			memory.valueBits.regBits.destBits = line->op2.value;
 			memory.valueBits.regBits.srcBits = line->op1.value;
 
-			addWordToMemory(memoryArr, memoryCounter, memory); /* Add indirect register operand memory word. */
+			insertWordIntoMemory(memoryArr, memoryCounter, memory); /* Add indirect register operand memory word. */
 		}
 		else if (line->op1.type == OP_INDIRECT_REG && line->op2.type == OP_REGULAR_REG)
 		{
@@ -189,7 +189,7 @@ boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 			memory.valueBits.regBits.destBits = line->op2.value;
 			memory.valueBits.regBits.srcBits = line->op1.value;
 
-			addWordToMemory(memoryArr, memoryCounter, memory); /* Add indirect register operand memory word. */
+			insertWordIntoMemory(memoryArr, memoryCounter, memory); /* Add indirect register operand memory word. */
 		}
 		else if (line->op1.type == OP_INDIRECT_REG && line->op2.type == OP_INDIRECT_REG)
 		{
@@ -198,20 +198,20 @@ boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 			memory.valueBits.regBits.destBits = line->op2.value;
 			memory.valueBits.regBits.srcBits = line->op1.value;
 
-			addWordToMemory(memoryArr, memoryCounter, memory); /* Add indirect register operand memory word. */
+			insertWordIntoMemory(memoryArr, memoryCounter, memory); /* Add indirect register operand memory word. */
 		}
 		else
 		{
 			if (line->op1.type != OP_INVALID)
 			{
 				line->op1.address = INITIAL_ADDRESS + *memoryCounter;
-				addWordToMemory(memoryArr, memoryCounter, getOpMemoryWord(line->op1, FALSE)); /* Add operand 1 memory word to memory. */
+				insertWordIntoMemory(memoryArr, memoryCounter, convertOperandToMemoryWord(line->op1, FALSE)); /* Add operand 1 memory word to memory. */
 			}
 
 			if (line->op2.type != OP_INVALID)
 			{
 				line->op2.address = INITIAL_ADDRESS + *memoryCounter;
-				addWordToMemory(memoryArr, memoryCounter, getOpMemoryWord(line->op2, TRUE)); /* Add operand 2 memory word to memory. */
+				insertWordIntoMemory(memoryArr, memoryCounter, convertOperandToMemoryWord(line->op2, TRUE)); /* Add operand 2 memory word to memory. */
 			}
 		}
 	}
@@ -219,7 +219,7 @@ boolean addLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line)
 	return !foundError; /* Return true if no error was found. */
 }
 
-void addDataToMemory(int *memoryArr, int *memoryCounter, int DC)
+void insertDataWithMask(int *memoryArr, int *memoryCounter, int DC)
 {
 	int i;
 	unsigned int mask = ~0;
@@ -244,17 +244,17 @@ int secondPass(int *memoryArr, lineInfo *linesArr, int lineNum, int IC, int DC)
 
 	adjustDataLabelAddresses(IC); /* Update the address of data labels based on IC. */
 
-	errorsFound += countIllegalEntries(); /* Count illegal entries and update errorsFound. */
+	errorsFound += validateEntryLabels(); /* Count illegal entries and update errorsFound. */
 
 	for (i = 0; i < lineNum; i++)
 	{
-		if (!addLineToMemory(memoryArr, &memoryCounter, &linesArr[i]))
+		if (!processLineToMemory(memoryArr, &memoryCounter, &linesArr[i]))
 		{
 			errorsFound++; /* Increment errorsFound if adding a line to memory fails. */
 		}
 	}
 
-	addDataToMemory(memoryArr, &memoryCounter, DC); /* Add data to memory after processing lines. */
+	insertDataWithMask(memoryArr, &memoryCounter, DC); /* Add data to memory after processing lines. */
 
 	return errorsFound; /* Return the total number of errors found. */
 }
