@@ -5,7 +5,7 @@
 #include "helpers.h"
 #include "second_pass.h"
 
-void updateDataLabelsAddress(int IC)
+void adjustDataLabelAddresses(int IC)
 {
 	int i;
 
@@ -242,7 +242,7 @@ int secondPass(int *memoryArr, lineInfo *linesArr, int lineNum, int IC, int DC)
 {
 	int errorsFound = 0, memoryCounter = 0, i;
 
-	updateDataLabelsAddress(IC); /* Update the address of data labels based on IC. */
+	adjustDataLabelAddresses(IC); /* Update the address of data labels based on IC. */
 
 	errorsFound += countIllegalEntries(); /* Count illegal entries and update errorsFound. */
 

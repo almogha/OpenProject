@@ -12,14 +12,16 @@
 #include "helpers.h"
 
 /**
- * @brief Updates the addresses of data labels by adding the instruction counter (IC) value.
+ * @brief Adjusts the addresses of all data labels in the global labels array.
  *
- * This function iterates through the global label array and updates the address of each data label
- * by adding the value of the instruction counter (IC). This is necessary for adjusting data labels
- * after the instruction section has been processed.
- * @param IC The instruction counter value to be added to the data labels' addresses.
+ * This function iterates through the global labels array and updates the
+ * addresses of all data labels by adding the given instruction counter (IC)
+ * value. It ensures that data labels have the correct memory address after
+ * the code section is processed.
+ *
+ * @param IC The instruction counter value to add to the address of each data label.
  */
-void updateDataLabelsAddress(int IC);
+void adjustDataLabelAddresses(int IC);
 
 /**
  * @brief Counts the number of illegal entry labels and reports errors.
