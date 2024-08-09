@@ -11,29 +11,37 @@
 #include "errors.h"
 #include "helpers.h"
 
-/**
- * @brief Adjusts the addresses of all data labels in the global labels array.
- *
- * This function iterates through the global labels array and updates the
- * addresses of all data labels by adding the given instruction counter (IC)
- * value. It ensures that data labels have the correct memory address after
- * the code section is processed.
- *
- * @param IC The instruction counter value to add to the address of each data label.
- */
-void adjustDataLabelAddresses(int IC);
 
  /**
- * @brief Validates entry labels in the global entry lines array.
+ * @brief Processes lines of code, adjusts label addresses, and updates memory with data (Second pass).
  *
- * This function iterates over the global array of entry lines (`g_entryLinesArr`)
- * and checks if the associated labels are valid. It counts labels that are either 
- * external or non-existent. 
- * Any issues encountered are reported, and the total number of illegal entry labels is returned.
- *
- * @return int The number of illegal entry labels found.
+ * This function performs the following tasks:
+ * 1. Updates data label addresses based on the current instruction counter (IC).
+ * 2. Validates entry labels and counts illegal entries.
+ * 3. Processes each line and adds it to memory.
+ * 4. Inserts data into memory with appropriate masking.
+ * @param memoryArr Pointer to the array representing memory.
+ * @param linesArr Pointer to the array of line information.
+ * @param lineNum The number of lines to process.
+ * @param IC The instruction counter value at the end of the first pass.
+ * @param DC The data counter value at the end of the first pass.
+ * @return The total number of errors found during processing.
  */
-int validateEntryLabels(void);
+int secondPass(int *memoryArr, lineInfo *linesArr, int lineNum, int IC, int DC);
+
+ /**
+ * @brief Processes a line of code and updates memory accordingly.
+ *
+ * This function checks if the provided line of code is valid and processes it by updating operand label addresses, 
+ * adding the command and operand memory words to memory, and handling different operand types.
+ * It also marks the line as erroneous if label updates fail.
+ * @param memoryArr Pointer to the array of memory words.
+ * @param memoryCounter Pointer to the memory counter.
+ * @param line Pointer to the lineInfo structure containing the line of code to be processed.
+ *
+ * @return boolean TRUE if the line was processed without errors, FALSE otherwise.
+ */
+boolean processLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line);
 
  /**
  * @brief Updates the operand's value with the address of the associated label, if applicable.
@@ -48,15 +56,6 @@ int validateEntryLabels(void);
  */
 boolean updateOperandLabelAddress(operandInfo *op, int lineNum);
 
- /**
- * @brief Extracts the numeric value from a memory word.
- *
- * This function applies a mask to a given memory word, shifts its bits,
- * and returns the processed numeric value.
- * @param memory A memoryWord struct containing the value bits and the 'are' field.
- * @return The processed numeric value from the memory word.
- */
-int extractValueFromMemoryWord(memoryWord memory);
 
 /**
  * Retrieves the ID of the operand type.
@@ -98,18 +97,38 @@ memoryWord convertOperandToMemoryWord(operandInfo op, boolean isDest);
 void insertWordIntoMemory(int *memoryArr, int *memoryCounter, memoryWord memory);
 
  /**
- * @brief Processes a line of code and updates memory accordingly.
+ * @brief Extracts the numeric value from a memory word.
  *
- * This function checks if the provided line of code is valid and processes it by updating operand label addresses, 
- * adding the command and operand memory words to memory, and handling different operand types.
- * It also marks the line as erroneous if label updates fail.
- * @param memoryArr Pointer to the array of memory words.
- * @param memoryCounter Pointer to the memory counter.
- * @param line Pointer to the lineInfo structure containing the line of code to be processed.
- *
- * @return boolean TRUE if the line was processed without errors, FALSE otherwise.
+ * This function applies a mask to a given memory word, shifts its bits,
+ * and returns the processed numeric value.
+ * @param memory A memoryWord struct containing the value bits and the 'are' field.
+ * @return The processed numeric value from the memory word.
  */
-boolean processLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line);
+int extractValueFromMemoryWord(memoryWord memory);
+
+ /**
+ * @brief Validates entry labels in the global entry lines array.
+ *
+ * This function iterates over the global array of entry lines (`g_entryLinesArr`)
+ * and checks if the associated labels are valid. It counts labels that are either 
+ * external or non-existent. 
+ * Any issues encountered are reported, and the total number of illegal entry labels is returned.
+ *
+ * @return int The number of illegal entry labels found.
+ */
+int validateEntryLabels(void);
+
+/**
+ * @brief Adjusts the addresses of all data labels in the global labels array.
+ *
+ * This function iterates through the global labels array and updates the
+ * addresses of all data labels by adding the given instruction counter (IC)
+ * value. It ensures that data labels have the correct memory address after
+ * the code section is processed.
+ *
+ * @param IC The instruction counter value to add to the address of each data label.
+ */
+void adjustDataLabelAddresses(int IC);
 
 /**
  * @brief Adds data to a memory array with a mask applied.
@@ -122,22 +141,5 @@ boolean processLineToMemory(int *memoryArr, int *memoryCounter, lineInfo *line);
  * @param DC The data counter value at the end of the first pass.
  */
 void insertDataWithMask(int *memoryArr, int *memoryCounter, int DC);
-
- /**
- * @brief Processes lines of code, adjusts label addresses, and updates memory with data (Second pass).
- *
- * This function performs the following tasks:
- * 1. Updates data label addresses based on the current instruction counter (IC).
- * 2. Validates entry labels and counts illegal entries.
- * 3. Processes each line and adds it to memory.
- * 4. Inserts data into memory with appropriate masking.
- * @param memoryArr Pointer to the array representing memory.
- * @param linesArr Pointer to the array of line information.
- * @param lineNum The number of lines to process.
- * @param IC The instruction counter value at the end of the first pass.
- * @param DC The data counter value at the end of the first pass.
- * @return The total number of errors found during processing.
- */
-int secondPass(int *memoryArr, lineInfo *linesArr, int lineNum, int IC, int DC);
 
 #endif
